@@ -21,8 +21,8 @@ parser.add_argument('--file',
 parser.add_argument('--target',
                                  dest    = 'target',
                                  action  = "store" ,
-                                 default = False ,
-                                 help    = "uploads using GET" )
+                                 default = '127.0.0.1' ,
+                                 help    = "TARGET to attack, defaults to localhost" )
 
 parser.add_argument('--mimehammer',
                                  dest    = 'mimehammer',
@@ -31,8 +31,6 @@ parser.add_argument('--mimehammer',
                                  help    = "Brute-Force mimetype upload" )
 
 arguments= parser.parse_args()
-print('Uploading to : ' + arguments.target)
-print('File : ' + arguments.file)
 
 class  Uploader:
     """just your basic file uploader!
@@ -53,6 +51,10 @@ class  Uploader:
                                          'image/jpeg',
                                          'image/png',
                                          'image/svg-xml']
+        if arguments.mimehammer is True:
+            mimehammer(self.url, self.fileobj, self.mimelist)
+        elif arguments.mimehammer is False:
+            sendfile(self.url, self.fileobj, self.header)
 
 
     def openfile(filename):
@@ -64,6 +66,8 @@ class  Uploader:
             print(error)
 
     def sendfile(target, content, head):
+        print('Uploading to : ' + arguments.target)
+        print('File : ' + arguments.file)
         try:
             if method == 'get':
                 upload = requests.get(target, data = content, headers = head )
@@ -86,10 +90,3 @@ class  Uploader:
         for each in mimearray:
             header = {'Content-type' : each}
             sendfile(victim, fileo, header)
-
-
-    if arguments.mimehammer is True:
-        mimehammer(self.url, self.fileobj, self.mimelist)
-
-    elif arguments.mimehammer is False:
-        sendfile(self.url, self.fileobj, self.header)

@@ -35,36 +35,21 @@ networkcard     = ''
 myip            = '192.168.0.3'
 mymacaddress    = "b4:b5:2f:cf:75:42"
 iface1          = 'eno1'
-
-#
-    ######################################################
-    #
-    #    ARP SPOOFER
-    #
-    ######################################################
-
+hostlist        = []
 def arpscanner():
     while True:
         try:
             sniff(lfilter = lambda x: x.haslayer(ARP), prn = arpscan, store = False )
         except KeyboardInterrupt:
             break
-
-
-    ######################################################
-    #
-    #    ARP SCANNER
-    #
-    ######################################################
-
-
 def arpscan(pkt):
     try:
         if pkt[ARP].op == 1:
-            print(pkt.summary())
             hostlist.append((pkt.psrc , pkt.hwsrc))
         setclean = set(hostlist)
         cleanhostlist = list(setclean)
+        for each in cleanhostlist:
+            print("Live host at: " + each[0])
     except KeyboardInterrupt:
         sys.exit(0)
 
@@ -82,12 +67,6 @@ def arpprinter():
         except KeyboardInterrupt:
             break
 
-
-    ######################################################
-    #
-    #    Menu System
-    #
-    ######################################################
 def signal_handler(signal, frame):
       p.terminate()
       p.join()
@@ -97,5 +76,3 @@ if argument.scanner == True :
     arpscanner()
 elif argument.spoofer == True :
     arpsniffer()
-elif argument.macchange == True:
-    selectiface()

@@ -2,7 +2,8 @@
 import requests
 import os
 import argparse
-
+from bs4 import BeautifulSoup
+import time
 #OPTIONS!
 parser = argparse.ArgumentParser(description='Brute-Force fuzzer for all methods and options, regexes for a reflection in the response')
 parser.add_argument('--file',
@@ -42,11 +43,13 @@ class  Uploader:
         self.header         = {}
         self.uploadfilename = uploadfilename
         self.fileobj        = openfile(self.uploadfilename)
+        self.savefile       = 'headers : '
         self.url            = arguments.target
         self.xforward       = arguments.xforward
         self.xforwardip     = arguments.xforwardedip
         self.useragent      = 'Mozilla/5.0 (X11; Linux x86_64; rv:28.0) Gecko/20100101  Firefox/28.0'
         self.mimetype       = ''
+
         self.mimelist       = mimelist = ['text/plain',
                                         'application/octet-stream',
                                         'text/css',
@@ -65,6 +68,8 @@ class  Uploader:
             self.header.update({'X-Forwarded-IP' : self.xforward})
         if arguments.cookiejar != None:
             self.cookie = openfile(self.cookiejar) #pulling a cookie from the jar!
+        #this starts the gunplay
+        fuzzer(self.url, self.fileobj)
 
     def openfile(filename):
         try:
@@ -88,6 +93,7 @@ class  Uploader:
                         print('status code : ' + upload.status_code)
                         if fuzzresult.status_code == 200:
                             fuzzanalyzer(fuzzresult.content)
+                            headersave(fuzzresult.headers)
             except KeyboardInterrupt:
                 print('KEYBOARD SIGNALS')
         elif arguments.cookiejar == None:
@@ -102,6 +108,7 @@ class  Uploader:
                         print('status code : ' + fuzzresult.status_code)
                         if fuzzresult.status_code == 200:
                             fuzzanalyzer(fuzzresult.content)
+                            headersave(fuzzresult.headers)
             except KeyboardInterrupt:
                 print('KEYBOARD SIGNALS')
 
@@ -111,3 +118,16 @@ class  Uploader:
                 sniff(iface=sniffiface, prn=GET_print, lfilter=lambda p: "GET" in str(p), filter="tcp port 80")
         except:
             print('something happened in the sniffer')
+
+    def headersave(head):
+        fileobj = open(self.savefile + time,  "w")
+        for each in head:
+            print(each, head[each])
+            fileobj.append(each, head[each])
+    fileobj.close()
+
+    def makesoup(recipie):
+        soupymess = BeautifulSoup(recipie , 'lxml')
+        #divs = soupyresults.find(lambda tag:  tag.name=='div' and tag.has_key('id') and tag['id'] ==divname)
+        #links = soupyresults.find_all(lambda tag:  tag.name=='a' and tag.has_key('alt') and tag['alt'] == 'Magnet Link')
+        print(links)

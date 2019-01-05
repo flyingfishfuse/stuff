@@ -1,25 +1,31 @@
 #!/bin/python
+#this is a big playground of experimentation so no its not useable
+# I use this with bpython using copy+paste to learn about http
+
 try:
     from urllib.parse import urlparse
 except ImportError:
     from urlparse import urlparse
-
-import requests
-import os
-import argparse
+from selenium import webdriver
+from selenium.webdriver.common import keys
 from bs4 import BeautifulSoup
+import urllib
+import requests
+import argparse
 import time
-import colorama
 import re
+import os
+
+import colorama
 from colorama import init
 init()
 from colorama import Fore, Back, Style
-parser = argparse.ArgumentParser(description='Brute-Force URL fuzz-a-lyzer')
 
+parser = argparse.ArgumentParser(description='Brute-Force URL fuzz-a-lyzer')
 parser.add_argument('--target',
                                  dest    = 'target',
                                  action  = "store" ,
-                                 default = 'http://127.0.0.1/hack/index.php?page=repeater.php' ,
+                                 default = 'http:192.168.0.3/bwapp/login.php' ,
                                  help    = "TARGET to attack, Don't forget the http://" )
 parser.add_argument('--cookie',
                                  dest    = 'cookiejar',
@@ -34,22 +40,106 @@ parser.add_argument('--method',
 parser.add_argument('--postdata',
                                  dest    = 'postdata',
                                  action  = "store" ,
-                                 default = None ,
+                                 default =  'login=bee&password=bug&security_level=0&form=submit',
                                  help    = "Data to send through post" )
+parser.add_argument('--extraheaders',
+                                 dest    = 'extraheaders',
+                                 action  = "store" ,
+                                 default = None ,
+                                 help    = "extra headers, anybody?" )
 
 arguments = parser.parse_args()
 
+#Don't hate on me for using global variables and declaring them at the start
+# it's easy to keep track of stuff!
+passfieldname = password
+bwaplogin   = 'http://192.168.0.3/bwapp/login.php'
+bwappass    = 'bug'
+bwapuser    = 'bee'
+password    = ('bee','bug')
 target      = arguments.target
 phpsessid   = ''
 header      = {}
 postdata    = {}
+soupymess   = None
 jsonbool    = False
-useragent   = 'Mozilla/5.0 (X11; Linux x86_64; rv:28.0) Gecko/20100101  Firefox/28.0'
+useragent   = {'User-Agent' : 'Mozilla/5.0 (X11; Linux x86_64; rv:28.0) Gecko/20100101  Firefox/28.0'}
+extraheaders= arguments.extraheaders
 fuzzystring = "FUZZYBUTT" #not a very common phrase, should be ok.
 fuzzerregex = re.compile(fuzzystring, re.IGNORECASE|re.DOTALL)
+inputs      = None
+typelist = ['name','type','id']
+nametype = ['username', 'login']
+usernamefield = None
+passfield     = None
 
-def geturlparams(url):
-    params = urlparse(url)
+def makeheaders(newheaders):
+    headers = header.update(useragent)
+    headers.update(newheaders)
+    return headers
+
+def requestslogin():
+    bwapsession = requests.session()
+    fuzz1 = bwapsession.get(url = bwaplogin)
+    bwapsession.auth(password)
+    #bwapsession.auth(bwapuser:bwapass)
+
+def seleniumgetlogin(url):
+    list = ['id','name']
+    blueprint("Trying to get login with selenium")
+    browser = webdriver.Chrome
+    browser.get(url)
+    greenprint("Waiting for 10 sec for reply")
+    time.sleep(10)
+    submit = browser.find_element_by_xpath("//*[@type='submit']")
+    passfield = browser.find_element_by_tag_type('password')
+    try:
+        userfield = browser.find_element_by_name('username')
+    except NoSuchElementException:
+        userfield = browser.find_element_by_name('login')
+    except NoSuchElementException:
+        userfield = browser.find_element_by_id('username')
+    except NoSuchElementException:
+        userfield = browser.find_element_by_id('login')
+
+def getparams(get):  #AND FUZZ THE CRAP OUT OF THEM <---- bookmark
+    return dict(parse.parse_qsl(parse.urlsplit(get).query))
+
+def getallinputs():
+    input = soupymess.find_all(lambda tag:  tag.name=='input')
+    return input
+
+#make a beautiful soup out of this messy html
+def getpasswordfield(htmlbody):
+    soupymess = BeautifulSoup(htmlbody , 'lxml')
+    #and find any inputs, shove em in a box for a handler!
+    for each in typelist:
+        asdf = makemess('input', each, 'password')
+        if asdf != None:
+        return asdf
+
+def getusernamefield(htmlbody):
+    soupymess = BeautifulSoup(htmlbody , 'lxml')
+    holder = None
+    for each in typelist:
+        holder = each
+        for each in nametype:
+            asdf = makemess('input', holder, each)
+            if asdf != None:
+                return asdf
+            else
+                pass
+    return asdf
+
+def makemess(tag, key, value)
+    asdf = soupymess.find_all(lambda tag:  tag.name==tag and tag.has_key(key) and tag[key] == value)
+    print(asdf)
+    return asdf
+
+def getsubmit(htmlbody):
+    soupymess = BeautifulSoup(htmlbody , 'lxml')
+    submit = makemess('input','type','submit')
+    print(submit)
 
 def checkifjson(urlcontent):
     try:
@@ -59,24 +149,21 @@ def checkifjson(urlcontent):
         urlcontent = req.content
         return False
 
-#make a beautiful soup out of this messy html
-def getinputs(htmlbody):
-    soupymess = BeautifulSoup(htmlbody , 'lxml')
-    #and find any inputs, shove em in a box for a handler!
-    input = soupymess.find(lambda tag:  tag.name=='input')
-    #submit = soupyresults.find_all(lambda tag:  tag.name=='submit' and tag.has_key('type') and tag['type'] == 'submit')
-    return input
+def blueprint(text)
+    print(Fore.BLUE + ' ' +  text + ' ' + Style.RESET_ALL)
 
-def getsubmit(htmlbody):
+def greenprint(text):
+    print(Fore.GREEN + ' ' +  text + ' ' + Style.RESET_ALL)
+
+def redprint(text):
+    print(Fore.RED + ' ' +  text + ' ' + Style.RESET_ALL)
 
 
-#if we are NOT making a POST request/upload
-if arguments.postdata != None:
+if arguments.postdata == None:
     req = requests.request(method = 'get', url = target ) #make the GET request
     if checkifjson(req.content) is False:
         webpageinput = getinputs(req.content) #SOUPIFY FOR INPUTS!
-
-
-def getinputsjson(jsondata):
-
-reflection = fuzzyregex.search()
+if arguments.postdata != None:
+    req = requests.request(method = 'post', url = target , params = ) #make the post request
+    if checkifjson(req.content) is False:
+        webpageinput = getinputs(req.content) #SOUPIFY FOR INPUTS!

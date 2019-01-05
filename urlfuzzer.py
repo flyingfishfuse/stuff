@@ -6,6 +6,7 @@ try:
     from urllib.parse import urlparse
 except ImportError:
     from urlparse import urlparse
+
 from selenium import webdriver
 from selenium.webdriver.common import keys
 from bs4 import BeautifulSoup
@@ -52,7 +53,6 @@ arguments = parser.parse_args()
 
 #Don't hate on me for using global variables and declaring them at the start
 # it's easy to keep track of stuff!
-passfieldname = password
 bwaplogin   = 'http://192.168.0.3/bwapp/login.php'
 bwappass    = 'bug'
 bwapuser    = 'bee'
@@ -70,7 +70,7 @@ fuzzerregex = re.compile(fuzzystring, re.IGNORECASE|re.DOTALL)
 inputs      = None
 typelist = ['name','type','id']
 nametype = ['username', 'login']
-usernamefield = None
+userfield = None
 passfield     = None
 
 def makeheaders(newheaders):
@@ -85,9 +85,8 @@ def requestslogin():
     #bwapsession.auth(bwapuser:bwapass)
 
 def seleniumgetlogin(url):
-    list = ['id','name']
     blueprint("Trying to get login with selenium")
-    browser = webdriver.Chrome
+    browser = webdriver.phantomjs
     browser.get(url)
     greenprint("Waiting for 10 sec for reply")
     time.sleep(10)
@@ -116,7 +115,7 @@ def getpasswordfield(htmlbody):
     for each in typelist:
         asdf = makemess('input', each, 'password')
         if asdf != None:
-        return asdf
+            return asdf
 
 def getusernamefield(htmlbody):
     soupymess = BeautifulSoup(htmlbody , 'lxml')
@@ -127,11 +126,11 @@ def getusernamefield(htmlbody):
             asdf = makemess('input', holder, each)
             if asdf != None:
                 return asdf
-            else
+            else:
                 pass
     return asdf
 
-def makemess(tag, key, value)
+def makemess(tag, key, value):
     asdf = soupymess.find_all(lambda tag:  tag.name==tag and tag.has_key(key) and tag[key] == value)
     print(asdf)
     return asdf
@@ -149,7 +148,7 @@ def checkifjson(urlcontent):
         urlcontent = req.content
         return False
 
-def blueprint(text)
+def blueprint(text):
     print(Fore.BLUE + ' ' +  text + ' ' + Style.RESET_ALL)
 
 def greenprint(text):
@@ -164,6 +163,7 @@ if arguments.postdata == None:
     if checkifjson(req.content) is False:
         webpageinput = getinputs(req.content) #SOUPIFY FOR INPUTS!
 if arguments.postdata != None:
-    req = requests.request(method = 'post', url = target , params = ) #make the post request
+    postparams = getparams(arguments.postdata)
+    req = requests.request(method = 'post', url = target , params = postparams) #make the post request
     if checkifjson(req.content) is False:
         webpageinput = getinputs(req.content) #SOUPIFY FOR INPUTS!

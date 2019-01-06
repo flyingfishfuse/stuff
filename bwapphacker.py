@@ -34,7 +34,7 @@ passinput = {}
 optionname = {'bug':'2','form':'submit'}
 fuzzystring = "FUZZYBUTT" #not a very common phrase, should be ok.
 fuzzerregex = re.compile(fuzzystring, re.IGNORECASE|re.DOTALL)
-optionlist = {}
+optionlist = []
 def seleniumlogin(username,password):
     chromeoptions = Options()
     chromeoptions.add_argument('--headless')
@@ -73,8 +73,8 @@ def getreflection():
 
 def selectoptions(htmlbody):
     alloptions = soupymess.find_all(lambda tag:  tag.name=='option' and tag.has_attr('value'))
-    for option in asdf:
-        optionlist.update({'value' : option['value']})
+    for option in alloptions:
+        optionlist.append({'value' : option['value']})
 
 def makesoup(htmlbody):
     global soupymess
@@ -86,16 +86,20 @@ def loginrequests(target, username, password):
     sess.get(target, headers= useragent)
     afterlogin = sess.post(url = target , data = postparams) #make the post request
     makesoup(afterlogin.content)
-    seloptions = selectoptions()
+    selectoptions(afterlogin.content)
+    inputs = getallinputs()
 
 
 def getalllinks(html):
-    soupymess.find_all(lambda tag:  tag.name=='a' and tag.has_attr('href') and tag['type'] == 'password')
+    soupymess.find_all(lambda tag:  tag.name=='a' and tag.has_attr('href'))
 
+def getallinputs():
+    return soupymess.find_all(lambda tag:  tag.name=='input')
 
-def xssinjector():
-    getparams(sess.url)
-    try:
-        with open(macfile , "r") as f:
-            filelines = f.readlines()
-            for eachline in filelines:
+loginrequests(bwaplogin, bwapuser, bwappass)
+#def xssinjector():
+#    getparams(sess.url)
+#    try:
+#        with open(macfile , "r") as f:
+#            filelines = f.readlines()
+#            for eachline in filelines:

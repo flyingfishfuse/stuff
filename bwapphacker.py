@@ -24,17 +24,23 @@ bwaplogin   = 'http://192.168.0.3/bwapp/login.php'
 bwapgetxss  = 'http://192.168.0.3/bwapp/htmli_get.php'
 bwappass    = 'bug'
 bwapuser    = 'bee'
-postparams   = {'login': bwapuser, 'password': bwappass, 'security_level':'0', 'form':'submit'}
-typelist = ['name','type','id']
-nametype = ['username', 'login']
-userfield = None
-passfield     = None
-userinput = {}
-passinput = {}
-optionname = {'bug':'2','form':'submit'}
+postparams  = {'login': bwapuser, 'password': bwappass, 'security_level':'0', 'form':'submit'}
+typelist    = ['name','type','id']
+nametype    = ['username', 'login']
+userfield   = None
+passfield   = None
+userinput   = {}
+passinput   = {}
+optionname  = {'bug':'2','form':'submit'}
 fuzzystring = "FUZZYBUTT" #not a very common phrase, should be ok.
 fuzzerregex = re.compile(fuzzystring, re.IGNORECASE|re.DOTALL)
-optionlist = []
+optionlist  = []
+linklist    = []
+sess        = None
+afterlogin  = None
+currentpage = None
+currentpageinputs =None
+
 def seleniumlogin(username,password):
     chromeoptions = Options()
     chromeoptions.add_argument('--headless')
@@ -84,10 +90,20 @@ def loginrequests(target, username, password):
     global sess
     sess = requests.session()
     sess.get(target, headers= useragent)
-    afterlogin = sess.post(url = target , data = postparams) #make the post request
-    makesoup(afterlogin.content)
-    selectoptions(afterlogin.content)
+    global currentpage
+    currentpage = sess.post(url = target , data = postparams) #make the post request
+    makesoup(currentpage.content)
+    selectoptions(currentpage.content)
     inputs = getallinputs()
+
+def sessionrequests(target):
+    global currentpage
+    currentpage = sess.get(target, headers= useragent)
+    makesoup(currentpage.content)
+    currentpageinputs = getallinputs()
+
+#def getinjectionfields(inputs):
+#    for each in inputs:
 
 
 def getalllinks(html):
@@ -97,9 +113,17 @@ def getallinputs():
     return soupymess.find_all(lambda tag:  tag.name=='input')
 
 loginrequests(bwaplogin, bwapuser, bwappass)
-#def xssinjector():
-#    getparams(sess.url)
-#    try:
-#        with open(macfile , "r") as f:
-#            filelines = f.readlines()
-#            for eachline in filelines:
+print(currentpage.url)
+sessionrequests(bwapgetxss)
+print(currentpage.url)
+
+sessionrequests(bwapgetxss)
+
+def xssinjector(parameters, payloadfile):
+    getparams(currentpage.url)
+    try:
+        with open(payloadfile , "r") as f:
+            filelines = f.readlines()
+            for eachline in filelines:
+                urlencodedpayload = urllib.quote(eachline)
+                sess.get(currentpage)

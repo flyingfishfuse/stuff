@@ -40,6 +40,7 @@ sess        = None
 afterlogin  = None
 currentpage = None
 currentpageinputs =None
+inputlist   = []
 
 def seleniumlogin(username,password):
     chromeoptions = Options()
@@ -81,6 +82,11 @@ def selectoptions(htmlbody):
     alloptions = soupymess.find_all(lambda tag:  tag.name=='option' and tag.has_attr('value'))
     for option in alloptions:
         optionlist.append({'value' : option['value']})
+
+def selectinputs():
+    allinputs = soupymess.find_all(lambda tag:  tag.name=='input' and tag.has_attr('type') and tag['type'] == 'text')
+    for input in allinputs:
+        inputlist.append({'name' : option['name']})
 
 def makesoup(htmlbody):
     global soupymess

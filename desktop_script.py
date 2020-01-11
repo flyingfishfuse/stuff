@@ -29,8 +29,8 @@ import os
 
 init()
 FLAGS = flags.FLAGS
-flags.DEFINE_boolean("Radar", False , "Opens weather radar in a browser window")
-flags.DEFINE_string("Locale", 'neworleans', 'refer to the help for more options, you can put a city name, zip code, airport \
+flags.DEFINE_boolean("radar", False , "Opens weather radar in a browser window")
+flags.DEFINE_string("location", 'neworleans', 'refer to the help for more options, you can put a city name, zip code, airport \
                     code or GPS "/-78.46,106.79". Leave empty and use the "special" option for special options please')
 
 
@@ -51,7 +51,8 @@ cli_forcast_url             = local_forcast_terminal + local_forcast_locality
 
 FORCAST_HELP                = print(requests.request("get" , "https://wttr.in/:help").text)
 
-def get_local_forcast_text():
+def get_local_forcast_text(where_am_i):
+    cli_forcast_url = local_forcast_terminal + where_am_i
     #Gets a UTF-8 encoded forcast from a script online, help is available at FORCAST_HELP
     local_weather_forcast = requests.request('get' , cli_forcast_url).text 
 
@@ -69,9 +70,6 @@ def selenium__live_radar():
     # This line makes the browser open and grab the page
     browser.get(live_radar_web_location)
 
-if flags.Radar is True:
+if flags.radar is True:
     selenium__live_radar()
-else print 
-
-if __name__ == '__main__':
-  app.run(main)
+get_local_forcast_text(flags.location)

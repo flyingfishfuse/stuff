@@ -1,3 +1,6 @@
+#adding this file to the rust portal project, gonna have it select a mac for me.
+#also adding the chroot/sandbox script for safety
+
 import os
 import re
 regex1          = re.compile('.*(\\(hex\\)).*' , re.I)

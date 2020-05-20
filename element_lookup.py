@@ -81,7 +81,7 @@ specifics_list = ["physical" , "chemical", "nuclear", "ionization", "isotopes", 
 ##############                      BOT CORE                   #################
 ################################################################################
 #load the cogs into the bot
-for filename in cog_directory:
+for filename in cog_directory_files:
     if filename.endswith(".py"):
         bot.load_extension(f"cogs.{filename[:-3]}")
 
@@ -173,31 +173,29 @@ class Element_lookup(commands.Cog):
         # requested is within the range of known elements
         #checks atomic number
         if element_id_user_input in range(1-118) or \
-            #checks element name
             any(user_input == element_id_user_input for user_input in element_list) or \
-            # checks symbol
             any(user_input == element_id_user_input for user_input in symbol_list):
             # Element identification the user provided was in the list of elements
             # now we have to check the second input
-            if any(user_input == specifics_requested for user_input in specifics_list):
-            # second variable was validated sucessfully so now we
-            #do the thing
-                if specifics_requested.lower()      == "physical":
-                    get_physical_properties(element_id_user_input)
-                elif specifics_requested.lower() == "chemical":
-                    get_chemical_properties(element_id_user_input)
-                elif specifics_requested.lower() == "nuclear":
-                    get_nuclear_properties(element_id_user_input)
-                elif specifics_requested.lower() == "ionization":
-                    get_ionization_energy(element_id_user_input)
-                elif specifics_requested.lower() == "isotopes":
-                    get_isotopes(element_id_user_input)
-                elif specifics_requested.lower() == "oxistates":
-                    get_oxistates(element_id_user_input)
-        # input given by user was NOT found in the validation data
-            else:
-                user_input_was_wrong("specifics")
-                format_and_print_output(output_container)
+                if any(user_input == specifics_requested for user_input in specifics_list):
+                    # second variable was validated sucessfully so now we
+                    #do the thing
+                    if specifics_requested.lower()    == "physical":
+                        get_physical_properties(element_id_user_input)
+                    elif specifics_requested.lower()  == "chemical":
+                        get_chemical_properties(element_id_user_input)
+                    elif specifics_requested.lower()  == "nuclear":
+                        get_nuclear_properties(element_id_user_input)
+                    elif specifics_requested.lower()  == "ionization":
+                        get_ionization_energy(element_id_user_input)
+                    elif specifics_requested.lower()  == "isotopes":
+                        get_isotopes(element_id_user_input)
+                    elif specifics_requested.lower()  == "oxistates":
+                        get_oxistates(element_id_user_input)
+                        # input given by user was NOT found in the validation data
+                else:
+                    user_input_was_wrong("specifics")
+                    format_and_print_output(output_container)
         else:
             user_input_was_wrong("element")
             format_and_print_output(output_container)
@@ -230,26 +228,25 @@ class Element_lookup(commands.Cog):
         element_data_list = []
         return_element_by_id = lambda element_id_input : mendeleev.element(element_id_input)
         element_to_compare   = return_element_by_id(element_id_user_input)
-            for each in range(1,118):
-                element_object = return_element_by_id(each)
+        for each in range(1,118):
+            element_object = return_element_by_id(each)
             # CHANGE ELEMENT_OBJECT.NAME to ELEMENT_OBJECT.SOMETHING_ELSE
             # That is all you need to do, then add the new functionality to the
             # help and list
-                if data_type == "affinity":
-                    if less_greater == "less":
-                        if element_object.electron_affinity < element_to_compare.electron_affinity:
-                            element_list.append(element_object.electron_affinity)
-                    elif less_greater == "greater":
-                        if element_object.electron_affinity > element_to_compare.electron_affinity:
-                            element_list.append(element_object.electron_affinity)
-                elif data_type == "electronegativity":
-                    if less_greater == "less":
-                        if element_object.electronegativity < element_to_compare.electronegativity:
-                            element_list.append(element_object.electronegativity)
-                    elif less_greater == "greater":
-                        if element_object.electronegativity > element_to_compare.electronegativity:
-                            element_list.append(element_object.electronegativity)
-
+            if data_type == "affinity":
+                if less_greater == "less":
+                    if element_object.electron_affinity < element_to_compare.electron_affinity:
+                        element_list.append(element_object.electron_affinity)
+                elif less_greater == "greater":
+                    if element_object.electron_affinity > element_to_compare.electron_affinity:
+                        element_list.append(element_object.electron_affinity)
+            elif data_type == "electronegativity":
+                if less_greater == "less":
+                    if element_object.electronegativity < element_to_compare.electronegativity:
+                        element_list.append(element_object.electronegativity)
+                elif less_greater == "greater":
+                    if element_object.electronegativity > element_to_compare.electronegativity:
+                        element_list.append(element_object.electronegativity)
 
 ############################
 # beta FUNCTIONS
@@ -287,8 +284,8 @@ class Element_lookup(commands.Cog):
         Returns physical properties of the element requested
         '''
         element_object = mendeleev.element(element_id_user_input)
-        output_container.append("Hardness: "      + element_object.hardness  + "/n")
-        output_container.append("Softness: "      + element_object.softness
+        output_container.append("Hardness: "      + element_object.hardness      + "/n")
+        output_container.append("Softness: "      + element_object.softness      + "/n")
         output_container.append("Boiling Point:"  + element_object.boiling_point + "/n")
         output_container.append("Melting Point:"  + element_object.melting_point + "/n")
         output_container.append("Specific Heat:"  + element_object.specific_heat + "/n")
@@ -301,9 +298,9 @@ class Element_lookup(commands.Cog):
         element_object = mendeleev.element(element_id_user_input)
         output_container.append("Electron Affinity: "    + element_object.electron_affinity  + "/n")
         output_container.append("Heat Of Formation: "    + element_object.heat_of_formation  + "/n")
-        output_container.append("Heat Of Evaportation: " + element_object.evaporation_heat  + "/n")
-        output_container.append("Electronegativity: "    + element_object.electronegativity + "/n")
-        output_container.append("Covalent Radius: "      + element_object.covalent_radius  + "/n")
+        output_container.append("Heat Of Evaportation: " + element_object.evaporation_heat   + "/n")
+        output_container.append("Electronegativity: "    + element_object.electronegativity  + "/n")
+        output_container.append("Covalent Radius: "      + element_object.covalent_radius    + "/n")
         output_container.append("Polarizability: "       + element_object.dipole_polarizability  + "/n")
 ###############################################################################
     async def get_nuclear_properties(self, ctx, element_id_user_input):
@@ -311,18 +308,18 @@ class Element_lookup(commands.Cog):
         Returns Nuclear properties of the element requested
         '''
         element_object = mendeleev.element(element_id_user_input)
-        output_container.append("Neutrons"         + element_object.neutrons + "/n")
-        output_container.append("Protons"         + element_object.protons + "/n")
+        output_container.append("Neutrons" + element_object.neutrons  + "/n")
+        output_container.append("Protons"  + element_object.protons   + "/n")
 ###############################################################################
     async def get_basic_element_properties(self, ctx, element_id_user_input):
         '''
         takes either a name,atomic number, or symbol
         '''
         element_object = mendeleev.element(element_id_user_input)
-        output_container.append("Element: "       + element_object.name + "/n")
+        output_container.append("Element: "       + element_object.name          + "/n")
         output_container.append("Atomic Weight: " + element_object.atomic_weight + "/n")
-        output_container.append("CAS Number: "    + element_object.cas  + "/n")
-        output_container.append("Mass:"           + element_object.mass + "/n")
+        output_container.append("CAS Number: "    + element_object.cas           + "/n")
+        output_container.append("Mass:"           + element_object.mass          + "/n")
 
 
 ###############################################################################

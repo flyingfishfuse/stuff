@@ -75,7 +75,7 @@ symbol_list = ['H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne', 'Na', \
     'Bk', 'Cf', 'Es', 'Fm', 'Md', 'No', 'Lr', 'Rf', 'Db', 'Sg', 'Bh', 'Hs', \
     'Mt', 'Ds', 'Rg', 'Cn', 'Nh', 'Fl', 'Mc', 'Lv', 'Ts']
 
-specifics_list: = ["physical" , "chemical", "nuclear", "ionization", "isotopes", "oxistates"]
+specifics_list = ["physical" , "chemical", "nuclear", "ionization", "isotopes", "oxistates"]
 
 ################################################################################
 ##############                      BOT CORE                   #################
@@ -156,7 +156,7 @@ class Element_lookup(commands.Cog):
         '''
         if type_of_pebkac_failure == "element":
             output_container = user_is_a_doofus_element_message
-        else if type_of_pebkac_failure == "specifics":
+        if type_of_pebkac_failure == "specifics":
             output_container = user_is_a_doofus_specifics_message
         pass
 
@@ -196,8 +196,10 @@ class Element_lookup(commands.Cog):
         # input given by user was NOT found in the validation data
             else:
                 user_input_was_wrong("specifics")
+                format_and_print_output(output_container)
         else:
             user_input_was_wrong("element")
+            format_and_print_output(output_container)
 ###############################################################################
     async def format_and_print_output(container_of_output : list):
         '''
@@ -220,6 +222,9 @@ class Element_lookup(commands.Cog):
 ############################
 # alpha FUNCTIONS
 ###########################
+# these needs to be integrated to the main script
+# This function compares ALL the elements to the one you provide
+# you can extend the functionality by copying the relevant code
     async def compare_element_list(self, ctx, *, data_type : str, less_greater: str):
         element_data_list = []
         return_element_by_id = lambda element_id_input : mendeleev.element(element_id_input)
@@ -227,6 +232,8 @@ class Element_lookup(commands.Cog):
             for each in range(1,118):
                 element_object = return_element_by_id(each)
             # CHANGE ELEMENT_OBJECT.NAME to ELEMENT_OBJECT.SOMETHING_ELSE
+            # That is all you need to do, then add the new functionality to the
+            # help and list
                 if data_type == "affinity":
                     if less_greater == "less":
                         if element_object.electron_affinity < element_to_compare.electron_affinity:
@@ -246,15 +253,19 @@ class Element_lookup(commands.Cog):
 ############################
 # beta FUNCTIONS
 ###########################
+#these are already integrated into the core code of the script
+# they are not finished, but functional
     async def get_basic_information(self, ctx, element_id_user_input):
         '''
         Returns some basic information about the element requested
         takes either a name,atomic number, or symbol
         '''
-        element_object = mendeleev.element(element_id_user_input)
-        output_container.append("Sources: " + element_object.sources  + "/n")
-        output_container.append("Uses: " + element_object.uses        + "/n")
-
+        try:
+            element_object = mendeleev.element(element_id_user_input)
+            output_container.append("Sources: " + element_object.sources  + "/n")
+            output_container.append("Uses: " + element_object.uses        + "/n")
+        except :
+            print(Exception)
 ###############################################################################
     async def get_isotopes(self, ctx, element_id_user_input):
         '''

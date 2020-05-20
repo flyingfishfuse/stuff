@@ -152,7 +152,7 @@ class Element_lookup(commands.Cog):
         '''
         You can put something funny here!
             This is something the creator of the bot needs to modify to suit
-            Thier comminuty.
+            Thier community.
         '''
         if type_of_pebkac_failure == "element":
             output_container = user_is_a_doofus_element_message
@@ -203,7 +203,7 @@ class Element_lookup(commands.Cog):
         '''
         Makes a pretty formatted message as a return value
             This is something the creator of the bot needs to modify to suit
-            Thier comminuty.
+            Thier community.
         '''
         output_string = ""
         for each in container_of_output:
@@ -216,6 +216,36 @@ class Element_lookup(commands.Cog):
 ################################################################################
 ##############          COMMANDS AND USER FUNCTIONS            #################
 ################################################################################
+# command is {prefix}{compare_element_list}{"affinity" OR "electronegativity"}{"less" OR "greater"}
+############################
+# alpha FUNCTIONS
+###########################
+    async def compare_element_list(self, ctx, *, data_type : str, less_greater: str):
+        element_data_list = []
+        return_element_by_id = lambda element_id_input : mendeleev.element(element_id_input)
+        element_to_compare   = return_element_by_id(element_id_user_input)
+            for each in range(1,118):
+                element_object = return_element_by_id(each)
+            # CHANGE ELEMENT_OBJECT.NAME to ELEMENT_OBJECT.SOMETHING_ELSE
+                if data_type == "affinity":
+                    if less_greater == "less":
+                        if element_object.electron_affinity < element_to_compare.electron_affinity:
+                            element_list.append(element_object.electron_affinity)
+                    else if less_greater == "greater":
+                        if element_object.electron_affinity > element_to_compare.electron_affinity:
+                            element_list.append(element_object.electron_affinity)
+                else if data_type == "electronegativity":
+                    if less_greater == "less":
+                        if element_object.electronegativity < element_to_compare.electronegativity:
+                            element_list.append(element_object.electronegativity)
+                    else if less_greater == "greater":
+                        if element_object.electronegativity > element_to_compare.electronegativity:
+                            element_list.append(element_object.electronegativity)
+
+
+############################
+# beta FUNCTIONS
+###########################
     async def get_basic_information(self, ctx, element_id_user_input):
         '''
         Returns some basic information about the element requested
@@ -295,18 +325,20 @@ class Element_lookup(commands.Cog):
 # table_headers = resource_soup.find_all('th')
 # data_table = soup.find('table',{'class':'wikitable sortable'})
 #
-###
+################################################################################
+### This is how you get lists of data for ALL the elements at once:
+##
 ### return_element_by_id = lambda element_id_input : mendeleev.element(element_id_input)
 ### for each in range(1,118):
 ###     asdf = return_element_by_id(each)
 ###     print(asdf.name)
 #    def generate_element_name_list():
-#        if validate_user_input == True :
-#            return_element_by_id = lambda element_id_input : mendeleev.element(element_id_input)
-#            for numberr in range(1,118):
-#                element_object = return_element_by_id(each)
-#                element_list.append(element_object.name)
-###############################################################################
+#       return_element_by_id = lambda element_id_input : mendeleev.element(element_id_input)
+#           for numberr in range(1,118):
+#               element_object = return_element_by_id(each)
+# CHANGE ELEMENT_OBJECT.NAME to ELEMENT_OBJECT.SOMETHING_ELSE
+#               element_list.append(element_object.name)
+################################################################################
 #    async def list_resources(self, ctx, *,):
 #        listy_list = []
 #        resource_soup = BeautifulSoup(requests.get(data_pages_list).text,'lxml')

@@ -156,9 +156,10 @@ class Element_lookup(commands.Cog):
         '''
         if type_of_pebkac_failure == "element":
             output_container = user_is_a_doofus_element_message
-        if type_of_pebkac_failure == "specifics":
+        elif type_of_pebkac_failure == "specifics":
             output_container = user_is_a_doofus_specifics_message
-        pass
+        else:
+            output_container = "something wierd happened in: user_input_was_wrong()"
 
 ###############################################################################
     async def validate_user_input(self, ctx, *, element_id_user_input, specifics_requested):
@@ -166,8 +167,8 @@ class Element_lookup(commands.Cog):
         checks if the user is requesting an actual element and set of data.
         '''
         #lets do some preliminary checks for special things to let other people
-        # add special behavior, this is a social networking bot after ALLOWING
-        if element_id_user_input
+        # add special behavior, this is a social networking bot after
+        #if element_id_user_input
         # loops over the element and symbol lists and checks if the data
         # requested is within the range of known elements
         #checks atomic number
@@ -183,15 +184,15 @@ class Element_lookup(commands.Cog):
             #do the thing
                 if specifics_requested.lower()      == "physical":
                     get_physical_properties(element_id_user_input)
-                else if specifics_requested.lower() == "chemical":
+                elif specifics_requested.lower() == "chemical":
                     get_chemical_properties(element_id_user_input)
-                else if specifics_requested.lower() == "nuclear":
+                elif specifics_requested.lower() == "nuclear":
                     get_nuclear_properties(element_id_user_input)
-                else if specifics_requested.lower() == "ionization":
+                elif specifics_requested.lower() == "ionization":
                     get_ionization_energy(element_id_user_input)
-                else if specifics_requested.lower() == "isotopes":
+                elif specifics_requested.lower() == "isotopes":
                     get_isotopes(element_id_user_input)
-                else if specifics_requested.lower() == "oxistates":
+                elif specifics_requested.lower() == "oxistates":
                     get_oxistates(element_id_user_input)
         # input given by user was NOT found in the validation data
             else:
@@ -238,14 +239,14 @@ class Element_lookup(commands.Cog):
                     if less_greater == "less":
                         if element_object.electron_affinity < element_to_compare.electron_affinity:
                             element_list.append(element_object.electron_affinity)
-                    else if less_greater == "greater":
+                    elif less_greater == "greater":
                         if element_object.electron_affinity > element_to_compare.electron_affinity:
                             element_list.append(element_object.electron_affinity)
-                else if data_type == "electronegativity":
+                elif data_type == "electronegativity":
                     if less_greater == "less":
                         if element_object.electronegativity < element_to_compare.electronegativity:
                             element_list.append(element_object.electronegativity)
-                    else if less_greater == "greater":
+                    elif less_greater == "greater":
                         if element_object.electronegativity > element_to_compare.electronegativity:
                             element_list.append(element_object.electronegativity)
 

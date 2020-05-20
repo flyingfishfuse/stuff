@@ -30,6 +30,9 @@ data_list           = wikipedia.page(title='List_of_data_references_for_chemical
 #this is the  message sent by the bot if the user input did not pass validation
 user_is_a_doofus_message = "Stop being a doofus and feed the data I expect!"
 
+#TODO: TYPE UP HELP MESSAGE
+help_message = "Type something here please"
+
 element_list      = ['Hydrogen', 'Helium', 'Lithium', 'Beryllium', 'Boron', \
     'Carbon', 'Nitrogen', 'Oxygen', 'Fluorine', 'Neon', 'Sodium', \
     'Magnesium', 'Aluminum', 'Silicon', 'Phosphorus', 'Sulfur', 'Chlorine', \
@@ -124,7 +127,7 @@ async def lookup(ctx, arg1, arg2):
     Element_lookup.validate_user_input(arg1, arg2)
     # once the data is parsed, you have to format!
     #this line sends the final output to the channel the user is asking from
-    await ctx.send(format_and_print_output(output_container))
+    await ctx.send(Element_lookup.format_and_print_output(output_container))
 
 ###############################################################################
 class Element_lookup(commands.Cog):
@@ -136,7 +139,7 @@ class Element_lookup(commands.Cog):
 ################################################################################
 ##############              INTERNAL  FUNCTIONS                #################
 ################################################################################
-    async def user_input_was_wrong(self, ctx,element_id_user_input, specifics_requested):
+    async def user_input_was_wrong(self, ctx, *, element_id_user_input, specifics_requested):
         '''
         You can put something funny here!
         '''
@@ -145,16 +148,17 @@ class Element_lookup(commands.Cog):
 
 
 ###############################################################################
-    async def validate_user_input(self, ctx, *):
+    async def validate_user_input(self, ctx, *, element_id_user_input, specifics_requested):
         '''
-        checks if the user is requesting an actual element.
+        checks if the user is requesting an actual element and set of data.
         '''
-        element_id_user_input = []
-        specifics_requested   = []
-        # loops over the element and symbol lists and checks if the atomic number
+        # loops over the element and symbol lists and checks if the data
         # requested is within the range of known elements
+        #checks atomic number
         if element_id_user_input in range(1-118) or \
+        #checks element name
             any(user_input == element_id_user_input for user_input in element_list) or \
+        # checks symbol
             any(user_input == element_id_user_input for user_input in symbol_list):
         # Element identification the user provided was in the list of elements
             if specifics_requested.lower()      == "physical":
@@ -163,9 +167,13 @@ class Element_lookup(commands.Cog):
                 get_chemical_properties()
             else if specifics_requested.lower() == "ionization":
                 get_ionization_energy()
+            else if specifics_requested.lower() == "isotopes":
+                get_isotopes()
+            else if specifics_requested.lower() == "oxistates":
+                get_oxistates()
+        # input given by user was NOT found in the validation data
         else:
             user_input_was_wrong()
-
 
 ###############################################################################
     async def list_resources(self, ctx, *,):

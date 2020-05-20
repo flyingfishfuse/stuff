@@ -54,7 +54,12 @@ symbol_list = ['H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne', 'Na', \
     'Bk', 'Cf', 'Es', 'Fm', 'Md', 'No', 'Lr', 'Rf', 'Db', 'Sg', 'Bh', 'Hs', \
     'Mt', 'Ds', 'Rg', 'Cn', 'Nh', 'Fl', 'Mc', 'Lv', 'Ts']
 
-specifics_list: = ["physical" , "chemical", "ionization"]
+specifics_list: = ["physical" , "chemical", "ionization", "isotopes", "oxistates"]
+
+isotopes # makes list
+mass
+oxistates # makes list
+melting_point
 ###############################################################################
 ########    RANDOM CODE SNIPPETS  #################
 ###############################################################################
@@ -121,6 +126,16 @@ class Element_lookup(commands.Cog):
 
         pass
 
+    async def get_basic_information(self, ctx, element_id_user_input):
+        '''
+        Returns some basic information about the element requested
+        takes either a name,atomic number, or symbol
+        '''
+        element_object = mendeleev.element(element_id_user_input)
+        output_container.append("Sources: " + element_object.sources  + "/n")
+        output_container.append("Uses: " + element_object.uses        + "/n")
+
+
     async def get_ionization_energy(self, ctx, element_id_user_input):
         '''
         Returns physical properties of the element requested
@@ -135,8 +150,13 @@ class Element_lookup(commands.Cog):
         takes either a name,atomic number, or symbol
         '''
         element_object = mendeleev.element(element_id_user_input)
+        output_container.append("Mass:"           + element_object.mass + "/n")
         output_container.append("Hardness: "      + element_object.hardness  + "/n")
-        output_container.append("Boiling Point:"  + element_object.boiling_point  + "/n")
+        output_container.append("Softness: "      + element_object.softness
+        output_container.append("Boiling Point:"  + element_object.boiling_point + "/n")
+        output_container.append("Melting Point:"  + element_object.melting_point + "/n")
+        output_container.append("Specific Heat:"  + element_object.specific_heat + "/n")
+        output_container.append("Thermal Conductivity:"  + element_object.thermal_conductivity + "/n")
 
     async def get_chemical_properties(self, ctx, element_id_user_input):
         '''
@@ -162,3 +182,6 @@ class Element_lookup(commands.Cog):
         output_container.append("Element: "       + element_object.name + "/n")
         output_container.append("Atomic Weight: " + element_object.atomic_weight + "/n")
         output_container.append("CAS Number: "    + element_object.cas  + "/n")
+        neutrons
+
+    protons

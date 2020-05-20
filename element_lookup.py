@@ -28,6 +28,7 @@ bot = commands.Bot(command_prefix=("."))
 #who dis?
 devs = [446959856318939137, 589968097369128966]
 cog_directory_files = os.listdir("./cogs")
+load_cogs = False
 #not used yet
 input_container     = []
 #used yet
@@ -41,6 +42,10 @@ user_is_a_doofus_element_message = "Stop being a doofus and feed the data on ele
 user_is_a_doofus_specific_message = "Stop being a doofus and feed the data on specifics that I expect!"
 #TODO: TYPE UP HELP MESSAGE
 help_message = "Put the element's name, symbol, or atomic number followed by either: physical, chemical, nuclear, ionization, isotopes, oxistates"
+
+def function_failure_message():
+    import inspect
+    return "something wierd happened in: " + inspect.currentframe().f_code.co_name
 
 element_list = ['Hydrogen', 'Helium', 'Lithium', 'Beryllium', 'Boron', \
     'Carbon', 'Nitrogen', 'Oxygen', 'Fluorine', 'Neon', 'Sodium', \
@@ -81,9 +86,10 @@ specifics_list = ["physical" , "chemical", "nuclear", "ionization", "isotopes", 
 ##############                      BOT CORE                   #################
 ################################################################################
 #load the cogs into the bot
-for filename in cog_directory_files:
-    if filename.endswith(".py"):
-        bot.load_extension(f"cogs.{filename[:-3]}")
+if load_cogs == True:
+    for filename in cog_directory_files:
+        if filename.endswith(".py"):
+            bot.load_extension(f"cogs.{filename[:-3]}")
 
 # check if the person sending the command is a developer
 def dev_check(ctx):
@@ -159,7 +165,8 @@ class Element_lookup(commands.Cog):
         elif type_of_pebkac_failure == "specifics":
             output_container = user_is_a_doofus_specifics_message
         else:
-            output_container = "something wierd happened in: user_input_was_wrong()"
+            output_container = function_failure_message
+
 
 ###############################################################################
     async def validate_user_input(self, ctx, *, element_id_user_input, specifics_requested):

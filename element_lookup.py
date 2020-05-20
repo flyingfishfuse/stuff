@@ -42,7 +42,7 @@ user_is_a_doofus_element_message = "Stop being a doofus and feed the data on ele
 user_is_a_doofus_specific_message = "Stop being a doofus and feed the data on specifics that I expect!"
 #TODO: TYPE UP HELP MESSAGE
 help_message = "Put the element's name, symbol, or atomic number followed by either: physical, chemical, nuclear, ionization, isotopes, oxistates"
-
+#shamelessly stolen from stackoverflow
 def function_failure_message():
     import inspect
     return "something wierd happened in: " + inspect.currentframe().f_code.co_name
@@ -125,7 +125,7 @@ async def on_ready():
 
 #HELP COMMAND
 @bot.command()
-async def help(ctx):
+async def usage(ctx):
     await ctx.send(help_message)
 
 #FIRST COMMAND

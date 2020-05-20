@@ -28,8 +28,9 @@ output_container    = []
 data_list           = wikipedia.page(title='List_of_data_references_for_chemical_elements')
 
 #this is the  message sent by the bot if the user input did not pass validation
-user_is_a_doofus_message = "Stop being a doofus and feed the data I expect!"
-
+user_is_a_doofus_element_message = "Stop being a doofus and feed the data on elements that I expect!"
+#this is the  message sent by the bot if the user input did not pass validation
+user_is_a_doofus_specific_message = "Stop being a doofus and feed the data on specifics that I expect!"
 #TODO: TYPE UP HELP MESSAGE
 help_message = "Type something here please"
 
@@ -139,12 +140,14 @@ class Element_lookup(commands.Cog):
 ################################################################################
 ##############              INTERNAL  FUNCTIONS                #################
 ################################################################################
-    async def user_input_was_wrong(self, ctx, *, element_id_user_input, specifics_requested):
+    async def user_input_was_wrong(type_of_pebkac_failure):
         '''
         You can put something funny here!
         '''
-        output_container = user_is_a_doofus_message
-        pass
+        if type_of_pebkac_failure == "element":
+            output_container = user_is_a_doofus_element_message
+        else if type_of_pebkac_failure == "specifics"
+            output_container = user_is_a_doofus_specifics_message
 
 
 ###############################################################################
@@ -152,32 +155,43 @@ class Element_lookup(commands.Cog):
         '''
         checks if the user is requesting an actual element and set of data.
         '''
+        #lets do some preliminary checks for special things to let other people
+        # add special behavior, this is a social networking bot after ALLOWING
+        if element_id_user_input
         # loops over the element and symbol lists and checks if the data
         # requested is within the range of known elements
         #checks atomic number
         if element_id_user_input in range(1-118) or \
-        #checks element name
+            #checks element name
             any(user_input == element_id_user_input for user_input in element_list) or \
-        # checks symbol
+            # checks symbol
             any(user_input == element_id_user_input for user_input in symbol_list):
-        # Element identification the user provided was in the list of elements
-            if specifics_requested.lower()      == "physical":
-                get_physical_properties(element_id_user_input)
-            else if specifics_requested.lower() == "chemical":
-                get_chemical_properties(element_id_user_input)
-            else if specifics_requested.lower() == "ionization":
-                get_ionization_energy(element_id_user_input)
-            else if specifics_requested.lower() == "isotopes":
-                get_isotopes(element_id_user_input)
-            else if specifics_requested.lower() == "oxistates":
-                get_oxistates(element_id_user_input)
+            # Element identification the user provided was in the list of elements
+            # now we have to check the second input
+            if any(user_input == specifics_requested for user_input in specifics_list):
+            # second variable was validated sucessfully so now we
+            #do the thing
+                if specifics_requested.lower()      == "physical":
+                    get_physical_properties(element_id_user_input)
+                else if specifics_requested.lower() == "chemical":
+                    get_chemical_properties(element_id_user_input)
+                else if specifics_requested.lower() == "ionization":
+                    get_ionization_energy(element_id_user_input)
+                else if specifics_requested.lower() == "isotopes":
+                    get_isotopes(element_id_user_input)
+                else if specifics_requested.lower() == "oxistates":
+                    get_oxistates(element_id_user_input)
+            else:
+                user_input_was_wrong("specifics")
         # input given by user was NOT found in the validation data
         else:
-            user_input_was_wrong()
+            user_input_was_wrong("element")
 ###############################################################################
-    async def format_and_print_output(output_container):
+    async def format_and_print_output(container_of_output : list):
         '''
+        Makes a pretty formatted message as a return value
         '''
+        for each in container_of_output:
 
         pass
 ################################################################################

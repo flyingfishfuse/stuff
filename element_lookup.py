@@ -9,25 +9,31 @@ from itertools import cycle
 #from bs4 import BeautifulSoup
 from discord.ext import commands, tasks
 
-###############################################################################
-# Chemical element resource database from wikipedia for discord bot           #
+################################################################################
+## Chemical element resource database from wikipedia/mendeleev python library ##
+##                             for discord bot                                ##
 ###############################################################################
 ##    Search by element number, symbol,
 ##    list resources available
-##    show basic info if no specificity in query
+##    TODO: show basic info if no specificity in query
 # created by : mr_hai on discord / flyingfishfuse on github
-
+#
 #list_of_resources = "https://en.wikipedia.org/wiki/List_of_data_references_for_chemical_elements"
 #data_pages_list   = "https://en.wikipedia.org/wiki/Category:Chemical_element_data_pages"
 
+################################################################################
+##############                BASIC VARIABLES                  #################
+################################################################################
 bot = commands.Bot(command_prefix=("."))
+#who dis?
 devs = [446959856318939137, 589968097369128966]
 cog_directory_files = os.listdir("./cogs")
 #not used yet
 input_container     = []
 #used yet
 output_container    = []
-data_list           = wikipedia.page(title='List_of_data_references_for_chemical_elements')
+#TODO: give this as an option eventually.
+#data_list           = wikipedia.page(title='List_of_data_references_for_chemical_elements')
 
 #this is the  message sent by the bot if the user input did not pass validation
 user_is_a_doofus_element_message = "Stop being a doofus and feed the data on elements that I expect!"
@@ -36,7 +42,7 @@ user_is_a_doofus_specific_message = "Stop being a doofus and feed the data on sp
 #TODO: TYPE UP HELP MESSAGE
 help_message = "Put the element's name, symbol, or atomic number followed by either: physical, chemical, nuclear, ionization, isotopes, oxistates"
 
-element_list      = ['Hydrogen', 'Helium', 'Lithium', 'Beryllium', 'Boron', \
+element_list = ['Hydrogen', 'Helium', 'Lithium', 'Beryllium', 'Boron', \
     'Carbon', 'Nitrogen', 'Oxygen', 'Fluorine', 'Neon', 'Sodium', \
     'Magnesium', 'Aluminum', 'Silicon', 'Phosphorus', 'Sulfur', 'Chlorine', \
     'Argon', 'Potassium', 'Calcium', 'Scandium', 'Titanium', 'Vanadium', \
@@ -105,6 +111,7 @@ async def reload(ctx, extension):
     bot.load_extension(f"cogs.{extension}")
     await ctx.send(f"`{extension}`" + " Reloaded !")
 
+# WHEN STARTED, APPLY DIRECTLY TO FOREHEAD
 @bot.event
 async def on_ready():
     print("Element_properties_lookup_tool")

@@ -22,8 +22,9 @@ from discord.ext import commands, tasks
 bot = commands.Bot(command_prefix=("."))
 devs = [446959856318939137, 589968097369128966]
 cog_directory_files = os.listdir("./cogs")
-full_data           = False
+#not used yet
 input_container     = []
+#used yet
 output_container    = []
 data_list           = wikipedia.page(title='List_of_data_references_for_chemical_elements')
 
@@ -32,7 +33,7 @@ user_is_a_doofus_element_message = "Stop being a doofus and feed the data on ele
 #this is the  message sent by the bot if the user input did not pass validation
 user_is_a_doofus_specific_message = "Stop being a doofus and feed the data on specifics that I expect!"
 #TODO: TYPE UP HELP MESSAGE
-help_message = "Type something here please"
+help_message = "Put the element's name, symbol, or atomic number followed by either: physical, chemical, nuclear, ionization, isotopes, oxistates"
 
 element_list      = ['Hydrogen', 'Helium', 'Lithium', 'Beryllium', 'Boron', \
     'Carbon', 'Nitrogen', 'Oxygen', 'Fluorine', 'Neon', 'Sodium', \
@@ -67,7 +68,7 @@ symbol_list = ['H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne', 'Na', \
     'Bk', 'Cf', 'Es', 'Fm', 'Md', 'No', 'Lr', 'Rf', 'Db', 'Sg', 'Bh', 'Hs', \
     'Mt', 'Ds', 'Rg', 'Cn', 'Nh', 'Fl', 'Mc', 'Lv', 'Ts']
 
-specifics_list: = ["physical" , "chemical", "ionization", "isotopes", "oxistates"]
+specifics_list: = ["physical" , "chemical", "nuclear", "ionization", "isotopes", "oxistates"]
 
 ################################################################################
 ##############                      BOT CORE                   #################
@@ -143,12 +144,14 @@ class Element_lookup(commands.Cog):
     async def user_input_was_wrong(type_of_pebkac_failure):
         '''
         You can put something funny here!
+            This is something the creator of the bot needs to modify to suit
+            Thier comminuty.
         '''
         if type_of_pebkac_failure == "element":
             output_container = user_is_a_doofus_element_message
-        else if type_of_pebkac_failure == "specifics"
+        else if type_of_pebkac_failure == "specifics":
             output_container = user_is_a_doofus_specifics_message
-
+        pass
 
 ###############################################################################
     async def validate_user_input(self, ctx, *, element_id_user_input, specifics_requested):
@@ -175,25 +178,33 @@ class Element_lookup(commands.Cog):
                     get_physical_properties(element_id_user_input)
                 else if specifics_requested.lower() == "chemical":
                     get_chemical_properties(element_id_user_input)
+                else if specifics_requested.lower() == "nuclear":
+                    get_nuclear_properties(element_id_user_input)
                 else if specifics_requested.lower() == "ionization":
                     get_ionization_energy(element_id_user_input)
                 else if specifics_requested.lower() == "isotopes":
                     get_isotopes(element_id_user_input)
                 else if specifics_requested.lower() == "oxistates":
                     get_oxistates(element_id_user_input)
+        # input given by user was NOT found in the validation data
             else:
                 user_input_was_wrong("specifics")
-        # input given by user was NOT found in the validation data
         else:
             user_input_was_wrong("element")
 ###############################################################################
     async def format_and_print_output(container_of_output : list):
         '''
         Makes a pretty formatted message as a return value
+            This is something the creator of the bot needs to modify to suit
+            Thier comminuty.
         '''
+        output_string = ""
         for each in container_of_output:
-
-        pass
+            # I don't know what I am doing here, I have not worked with discord
+            # code before so I cannot really do much more than concatenate
+            # them all together into a new string and return that so that is
+            # what I am doing
+            output_string += each
 ################################################################################
 ##############          COMMANDS AND USER FUNCTIONS            #################
 ################################################################################

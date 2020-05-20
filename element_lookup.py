@@ -57,23 +57,7 @@ symbol_list = ['H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne', 'Na', \
 specifics_list: = ["physical" , "chemical", "ionization", "isotopes", "oxistates"]
 
 isotopes # makes list
-mass
 oxistates # makes list
-melting_point
-###############################################################################
-########    RANDOM CODE SNIPPETS  #################
-###############################################################################
-## links = My_table.findAll('a')
-## output_container.append(+ element_object.  + "/n")
-## return_element_by_id = lambda element_id_input : mendeleev.element(element_id_input)
-## output_container.append("" + element_object.  + "/n")
-##
-### return_element_by_id = lambda element_id_input : mendeleev.element(element_id_input)
-### for each in range(1,118):
-###     asdf = return_element_by_id(each)
-###     print(asdf.name)
-
-###############################################################################
 
 class Element_lookup(commands.Cog):
     def __init__(self, bot):
@@ -98,7 +82,7 @@ class Element_lookup(commands.Cog):
             any(user_input == element_id_user_input for user_input in symbol_list):
         # Element identification the user provided was in the list of elements
             if specifics_requested.lower()      == "physical":
-                get_physical_properties()
+                get_physical_properties(eleme)
             else if specifics_requested.lower() == "chemical":
                 get_chemical_properties()
             else if specifics_requested.lower() == "ionization":
@@ -106,19 +90,14 @@ class Element_lookup(commands.Cog):
         else:
             user_input_was_wrong()
 
-    def generate_element_name_list():
-        if validate_user_input == True :
-            return_element_by_id = lambda element_id_input : mendeleev.element(element_id_input)
-            for numberr in range(1,118):
-                element_object = return_element_by_id(each)
-                element_list.append(element_object.name)
-
     async def list_resources(self, ctx, *,):
         #listy_list = []
         #resource_soup = BeautifulSoup(requests.get(data_pages_list).text,'lxml')
         #content = resource_soup.find_all('div' , {'class' : 'mw-content-ltr'})
         #for each in content.find_all('a'):
         #    output_container.append(each)
+    pass
+
 
     def format_and_print_output(output_container):
         '''
@@ -135,11 +114,16 @@ class Element_lookup(commands.Cog):
         output_container.append("Sources: " + element_object.sources  + "/n")
         output_container.append("Uses: " + element_object.uses        + "/n")
 
+    async def get_isotopes(self, ctx, element_id_user_input):
+        '''
+        Returns Isotopes of the element requested
+        '''
+        element_object = mendeleev.element(element_id_user_input)
+        output_container.append("Isotopes: " + element_object.isotopes + "/n")
 
     async def get_ionization_energy(self, ctx, element_id_user_input):
         '''
         Returns physical properties of the element requested
-        takes either a name,atomic number, or symbol
         '''
         element_object = mendeleev.element(element_id_user_input)
         output_container.append("Ionization Energies: " + element_object.ionenergies  + "/n")
@@ -147,7 +131,6 @@ class Element_lookup(commands.Cog):
     async def get_physical_properties(self, ctx, element_id_user_input):
         '''
         Returns physical properties of the element requested
-        takes either a name,atomic number, or symbol
         '''
         element_object = mendeleev.element(element_id_user_input)
         output_container.append("Mass:"           + element_object.mass + "/n")
@@ -161,7 +144,6 @@ class Element_lookup(commands.Cog):
     async def get_chemical_properties(self, ctx, element_id_user_input):
         '''
         Returns Chemical properties of the element requested
-        takes either a name,atomic number, or symbol
         '''
         element_object = mendeleev.element(element_id_user_input)
         output_container.append("Electron Affinity: "    + element_object.electron_affinity  + "/n")
@@ -169,7 +151,13 @@ class Element_lookup(commands.Cog):
         output_container.append("Heat Of Evaportation: " + element_object.evaporation_heat  + "/n")
         output_container.append("Electronegativity: "    + element_object.electronegativity + "/n")
         output_container.append("Covalent Radius: "      + element_object.covalent_radius  + "/n")
-        output_container.append("Polarizability"         + element_object.dipole_polarizability  + "/n")
+        output_container.append("Polarizability: "       + element_object.dipole_polarizability  + "/n")
+
+    async def get_nuclear_properties(self, ctx, element_id_user_input):
+        element_object = mendeleev.element(element_id_user_input)
+        output_container.append("Neutrons"         + element_object.neutrons + "/n")
+        output_container.append("Protons"         + element_object.protons + "/n")
+
 
     async def get_basic_element_properties(self, ctx, element_id_user_input):
         '''
@@ -182,6 +170,23 @@ class Element_lookup(commands.Cog):
         output_container.append("Element: "       + element_object.name + "/n")
         output_container.append("Atomic Weight: " + element_object.atomic_weight + "/n")
         output_container.append("CAS Number: "    + element_object.cas  + "/n")
-        neutrons
 
-    protons
+        ###############################################################################
+        ########    RANDOM CODE SNIPPETS  #################
+        ###############################################################################
+        ## links = My_table.findAll('a')
+        ## output_container.append(+ element_object.  + "/n")
+        ## return_element_by_id = lambda element_id_input : mendeleev.element(element_id_input)
+        ## output_container.append("" + element_object.  + "/n")
+        ##
+        ### return_element_by_id = lambda element_id_input : mendeleev.element(element_id_input)
+        ### for each in range(1,118):
+        ###     asdf = return_element_by_id(each)
+        ###     print(asdf.name)
+        #    def generate_element_name_list():
+        #        if validate_user_input == True :
+        #            return_element_by_id = lambda element_id_input : mendeleev.element(element_id_input)
+        #            for numberr in range(1,118):
+        #                element_object = return_element_by_id(each)
+        #                element_list.append(element_object.name)
+        ###############################################################################

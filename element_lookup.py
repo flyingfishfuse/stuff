@@ -15,6 +15,7 @@ from discord.ext import commands, tasks
 ##    Search by element number, symbol,
 ##    list resources available
 ##    show basic info if no specificity in query
+# created by : mr_hai on discord / flyingfishfuse on github
 
 #list_of_resources = "https://en.wikipedia.org/wiki/List_of_data_references_for_chemical_elements"
 #data_pages_list   = "https://en.wikipedia.org/wiki/Category:Chemical_element_data_pages"
@@ -104,7 +105,6 @@ async def reload(ctx, extension):
     bot.load_extension(f"cogs.{extension}")
     await ctx.send(f"`{extension}`" + " Reloaded !")
 
-
 @bot.event
 async def on_ready():
     print("Element_properties_lookup_tool")
@@ -116,16 +116,16 @@ async def help(ctx):
     await ctx.send(help_message)
 
 #FIRST COMMAND
-@bot.command()
+# right here we define behavior for the command
+#   we are only ALLOWING two arguments:
+#     the element identification
+#     level of data requested
+# instantiate the class and pass the data the user provided to the validation
+#   function that will call everything else and parse the arguments. Once the
+#   arguments are parsed, the algorhithm is applied, the output is formatted,
+#   and the user is sent a reply@bot.command()
 @commands.check(dev_check)
 async def lookup(ctx, arg1, arg2):
-    # right here we define behavior for the command
-    # we are only ALLOWING two arguments:
-    # the element identification, and level of data requested
-    # instantiate the class and pass the data the user provided to the
-    # validation function that will call everything else and parse the arguments
-    # Once the arguments are parsed, the algorhithm is applied, the output is
-    # formatted, and the user is sent a reply!
     Element_lookup.validate_user_input(arg1, arg2)
     # once the data is parsed, you have to format!
     #this line sends the final output to the channel the user is asking from
@@ -205,6 +205,7 @@ class Element_lookup(commands.Cog):
             # them all together into a new string and return that so that is
             # what I am doing
             output_string += each
+        return output_string
 ################################################################################
 ##############          COMMANDS AND USER FUNCTIONS            #################
 ################################################################################

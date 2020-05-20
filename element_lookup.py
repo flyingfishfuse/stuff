@@ -21,10 +21,14 @@ from discord.ext import commands, tasks
 
 bot = commands.Bot(command_prefix=("."))
 devs = [446959856318939137, 589968097369128966]
-full_data         = False
-input_container   = []
-output_container  = []
-data_list         = wikipedia.page(title='List_of_data_references_for_chemical_elements')
+cog_directory_files = os.listdir("./cogs")
+full_data           = False
+input_container     = []
+output_container    = []
+data_list           = wikipedia.page(title='List_of_data_references_for_chemical_elements')
+
+#this is the  message sent by the bot if the user input did not pass validation
+user_is_a_doofus_message = "Stop being a doofus and feed the data I expect!"
 
 element_list      = ['Hydrogen', 'Helium', 'Lithium', 'Beryllium', 'Boron', \
     'Carbon', 'Nitrogen', 'Oxygen', 'Fluorine', 'Neon', 'Sodium', \
@@ -64,25 +68,30 @@ specifics_list: = ["physical" , "chemical", "ionization", "isotopes", "oxistates
 ################################################################################
 ##############                      BOT CORE                   #################
 ################################################################################
-# ctx is context
+#load the cogs into the bot
+for filename in cog_directory:
+    if filename.endswith(".py"):
+        bot.load_extension(f"cogs.{filename[:-3]}")
+
+# check if the person sending the command is a developer
 def dev_check(ctx):
     return str(ctx.author.id) in str(devs)
 
-
+#LOAD EXTENSION
 @bot.command()
 @commands.check(dev_check)
 async def load(ctx, extension):
     bot.load_extension(f"cogs.{extension}")
     await ctx.send(f"`{extension}`" + " Loaded !")
 
-
+#UNLOAD EXTENSION
 @bot.command()
 @commands.check(dev_check)
 async def unload(ctx, extension):
     bot.unload_extension(f"cogs.{extension}")
     await ctx.send(f"`{extension}`" + " Unloaded !")
 
-
+#RELOAD EXTENSION
 @bot.command()
 @commands.check(dev_check)
 async def reload(ctx, extension):
@@ -91,16 +100,31 @@ async def reload(ctx, extension):
     await ctx.send(f"`{extension}`" + " Reloaded !")
 
 
-for filename in os.listdir("./cogs"):
-    if filename.endswith(".py"):
-        bot.load_extension(f"cogs.{filename[:-3]}")
-
-
 @bot.event
 async def on_ready():
-    print("ChemDev Bitches")
+    print("Element_properties_lookup_tool")
     await bot.change_presence(activity=discord.Game(name="THIS IS BETA !"))
 
+#HELP COMMAND
+@bot.command()
+async def help(ctx):
+    await ctx.send(help_message)
+
+#FIRST COMMAND
+@bot.command()
+@commands.check(dev_check)
+async def lookup(ctx, arg1, arg2):
+    # right here we define behavior for the command
+    # we are only ALLOWING two arguments:
+    # the element identification, and level of data requested
+    # instantiate the class and pass the data the user provided to the
+    # validation function that will call everything else and parse the arguments
+    # Once the arguments are parsed, the algorhithm is applied, the output is
+    # formatted, and the user is sent a reply!
+    Element_lookup.validate_user_input(arg1, arg2)
+    # once the data is parsed, you have to format!
+    #this line sends the final output to the channel the user is asking from
+    await ctx.send(format_and_print_output(output_container))
 
 ###############################################################################
 class Element_lookup(commands.Cog):
@@ -116,14 +140,17 @@ class Element_lookup(commands.Cog):
         '''
         You can put something funny here!
         '''
+        output_container = user_is_a_doofus_message
         pass
 
 
 ###############################################################################
-    async def validate_user_input(self, ctx, element_id_user_input, specifics_requested):
+    async def validate_user_input(self, ctx, *):
         '''
         checks if the user is requesting an actual element.
         '''
+        element_id_user_input = []
+        specifics_requested   = []
         # loops over the element and symbol lists and checks if the atomic number
         # requested is within the range of known elements
         if element_id_user_input in range(1-118) or \
@@ -150,7 +177,7 @@ class Element_lookup(commands.Cog):
     pass
 
 ###############################################################################
-    def format_and_print_output(output_container):
+    async def format_and_print_output(output_container):
         '''
         '''
 

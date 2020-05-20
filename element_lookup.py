@@ -11,7 +11,7 @@ from discord.ext import commands
 ###############################################################################
 ##    Search by element number, symbol,
 ##    list resources available
-##    show show full info if no specificity in query
+##    show basic info if no specificity in query
 
 #list_of_resources = "https://en.wikipedia.org/wiki/List_of_data_references_for_chemical_elements"
 #data_pages_list   = "https://en.wikipedia.org/wiki/Category:Chemical_element_data_pages"
@@ -54,18 +54,7 @@ symbol_list = ['H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne', 'Na', \
     'Bk', 'Cf', 'Es', 'Fm', 'Md', 'No', 'Lr', 'Rf', 'Db', 'Sg', 'Bh', 'Hs', \
     'Mt', 'Ds', 'Rg', 'Cn', 'Nh', 'Fl', 'Mc', 'Lv', 'Ts']
 
-def validate_user_input(self, ctx, element_id_user_input, specifics_requested):
-    '''
-    checks if the user is requesting an actual element.
-    '''
-    # loops over the element and symbol lists and checks if the atomic number
-    # requested is within the range of known elements
-    if element_id_user_input in range(1-118) or \
-        any(user_input == element_id_user_input for user_input in element_list) or \
-        any(user_input == element_id_user_input for user_input in symbol_list):
-    
-        
-
+specifics_list: = ["physical" , "chemical", "ionization"]
 ###############################################################################
 ########    RANDOM CODE SNIPPETS  #################
 ###############################################################################
@@ -87,11 +76,37 @@ class Element_lookup(commands.Cog):
         print("loaded properties_lookup")
         generate_element_name_list()
 
+    async def user_input_was_wrong(self, ctx,element_id_user_input, specifics_requested):
+        '''
+        You can put something funny here!
+        '''
+        pass
+
+    async def validate_user_input(self, ctx, element_id_user_input, specifics_requested):
+        '''
+        checks if the user is requesting an actual element.
+        '''
+        # loops over the element and symbol lists and checks if the atomic number
+        # requested is within the range of known elements
+        if element_id_user_input in range(1-118) or \
+            any(user_input == element_id_user_input for user_input in element_list) or \
+            any(user_input == element_id_user_input for user_input in symbol_list):
+        # Element identification the user provided was in the list of elements
+            if specifics_requested.lower()      == "physical":
+                get_physical_properties()
+            else if specifics_requested.lower() == "chemical":
+                get_chemical_properties()
+            else if specifics_requested.lower() == "ionization":
+                get_ionization_energy()
+        else:
+            user_input_was_wrong()
+
     def generate_element_name_list():
-        return_element_by_id = lambda element_id_input : mendeleev.element(element_id_input)
-        for numberr in range(1,118):
-            element_object = return_element_by_id(each)
-            element_list.append(element_object.name)
+        if validate_user_input == True :
+            return_element_by_id = lambda element_id_input : mendeleev.element(element_id_input)
+            for numberr in range(1,118):
+                element_object = return_element_by_id(each)
+                element_list.append(element_object.name)
 
     async def list_resources(self, ctx, *,):
         #listy_list = []

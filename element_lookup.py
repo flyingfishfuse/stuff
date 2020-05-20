@@ -134,7 +134,7 @@ class Element_lookup(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         print("loaded properties_lookup")
-        generate_element_name_list()
+        #generate_element_name_list()
 
 ################################################################################
 ##############              INTERNAL  FUNCTIONS                #################
@@ -174,16 +174,6 @@ class Element_lookup(commands.Cog):
         # input given by user was NOT found in the validation data
         else:
             user_input_was_wrong()
-
-###############################################################################
-    async def list_resources(self, ctx, *,):
-        #listy_list = []
-        #resource_soup = BeautifulSoup(requests.get(data_pages_list).text,'lxml')
-        #content = resource_soup.find_all('div' , {'class' : 'mw-content-ltr'})
-        #for each in content.find_all('a'):
-        #    output_container.append(each)
-    pass
-
 ###############################################################################
     async def format_and_print_output(output_container):
         '''
@@ -283,6 +273,15 @@ class Element_lookup(commands.Cog):
 #            for numberr in range(1,118):
 #                element_object = return_element_by_id(each)
 #                element_list.append(element_object.name)
+###############################################################################
+#    async def list_resources(self, ctx, *,):
+        #listy_list = []
+        #resource_soup = BeautifulSoup(requests.get(data_pages_list).text,'lxml')
+        #content = resource_soup.find_all('div' , {'class' : 'mw-content-ltr'})
+        #for each in content.find_all('a'):
+        #    output_container.append(each)
+#    pass
+
 ###############################################################################
 
 bot.run("NzA2NzIyMjE0MzMzOTA2OTk1.XsT4dw.N9z8Z6WMZ2tSK3md2p26GjlK_UM")

@@ -162,15 +162,15 @@ class Element_lookup(commands.Cog):
             any(user_input == element_id_user_input for user_input in symbol_list):
         # Element identification the user provided was in the list of elements
             if specifics_requested.lower()      == "physical":
-                get_physical_properties(eleme)
+                get_physical_properties(element_id_user_input)
             else if specifics_requested.lower() == "chemical":
-                get_chemical_properties()
+                get_chemical_properties(element_id_user_input)
             else if specifics_requested.lower() == "ionization":
-                get_ionization_energy()
+                get_ionization_energy(element_id_user_input)
             else if specifics_requested.lower() == "isotopes":
-                get_isotopes()
+                get_isotopes(element_id_user_input)
             else if specifics_requested.lower() == "oxistates":
-                get_oxistates()
+                get_oxistates(element_id_user_input)
         # input given by user was NOT found in the validation data
         else:
             user_input_was_wrong()
@@ -199,7 +199,6 @@ class Element_lookup(commands.Cog):
         '''
         element_object = mendeleev.element(element_id_user_input)
         output_container.append("Isotopes: " + element_object.isotopes + "/n")
-
 ###############################################################################
     async def get_ionization_energy(self, ctx, element_id_user_input):
         '''
@@ -207,7 +206,6 @@ class Element_lookup(commands.Cog):
         '''
         element_object = mendeleev.element(element_id_user_input)
         output_container.append("Ionization Energies: " + element_object.ionenergies  + "/n")
-
 ###############################################################################
     async def get_physical_properties(self, ctx, element_id_user_input):
         '''
@@ -220,7 +218,6 @@ class Element_lookup(commands.Cog):
         output_container.append("Melting Point:"  + element_object.melting_point + "/n")
         output_container.append("Specific Heat:"  + element_object.specific_heat + "/n")
         output_container.append("Thermal Conductivity:"  + element_object.thermal_conductivity + "/n")
-
 ###############################################################################
     async def get_chemical_properties(self, ctx, element_id_user_input):
         '''
@@ -233,21 +230,19 @@ class Element_lookup(commands.Cog):
         output_container.append("Electronegativity: "    + element_object.electronegativity + "/n")
         output_container.append("Covalent Radius: "      + element_object.covalent_radius  + "/n")
         output_container.append("Polarizability: "       + element_object.dipole_polarizability  + "/n")
-
 ###############################################################################
     async def get_nuclear_properties(self, ctx, element_id_user_input):
+        '''
+        Returns Nuclear properties of the element requested
+        '''
         element_object = mendeleev.element(element_id_user_input)
         output_container.append("Neutrons"         + element_object.neutrons + "/n")
         output_container.append("Protons"         + element_object.protons + "/n")
-
 ###############################################################################
     async def get_basic_element_properties(self, ctx, element_id_user_input):
         '''
         takes either a name,atomic number, or symbol
         '''
-        #table_headers = resource_soup.find_all('th')
-        #data_table = soup.find('table',{'class':'wikitable sortable'})
-
         element_object = mendeleev.element(element_id_user_input)
         output_container.append("Element: "       + element_object.name + "/n")
         output_container.append("Atomic Weight: " + element_object.atomic_weight + "/n")
@@ -263,6 +258,11 @@ class Element_lookup(commands.Cog):
 ## return_element_by_id = lambda element_id_input : mendeleev.element(element_id_input)
 ## output_container.append("" + element_object.  + "/n")
 ##
+#
+# table_headers = resource_soup.find_all('th')
+# data_table = soup.find('table',{'class':'wikitable sortable'})
+#
+###
 ### return_element_by_id = lambda element_id_input : mendeleev.element(element_id_input)
 ### for each in range(1,118):
 ###     asdf = return_element_by_id(each)
@@ -275,13 +275,12 @@ class Element_lookup(commands.Cog):
 #                element_list.append(element_object.name)
 ###############################################################################
 #    async def list_resources(self, ctx, *,):
-        #listy_list = []
-        #resource_soup = BeautifulSoup(requests.get(data_pages_list).text,'lxml')
-        #content = resource_soup.find_all('div' , {'class' : 'mw-content-ltr'})
-        #for each in content.find_all('a'):
-        #    output_container.append(each)
+#        listy_list = []
+#        resource_soup = BeautifulSoup(requests.get(data_pages_list).text,'lxml')
+#        content = resource_soup.find_all('div' , {'class' : 'mw-content-ltr'})
+#        for each in content.find_all('a'):
+#            output_container.append(each)
 #    pass
-
 ###############################################################################
 
 bot.run("NzA2NzIyMjE0MzMzOTA2OTk1.XsT4dw.N9z8Z6WMZ2tSK3md2p26GjlK_UM")

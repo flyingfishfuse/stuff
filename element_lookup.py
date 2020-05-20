@@ -165,7 +165,7 @@ class Element_lookup(commands.Cog):
         elif type_of_pebkac_failure == "specifics":
             output_container = user_is_a_doofus_specifics_message
         else:
-            output_container = function_failure_message
+            output_container = function_failure_message()
 
 
 ###############################################################################

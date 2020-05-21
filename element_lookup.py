@@ -197,9 +197,9 @@ class Element_lookup(commands.Cog):
             Thier community.
         '''
         if type_of_pebkac_failure == "element":
-            output_container = user_is_a_doofus_element_message
+            output_container.append(user_is_a_doofus_element_message)
         elif type_of_pebkac_failure == "specifics":
-            output_container = user_is_a_doofus_specifics_message
+            output_container.append(user_is_a_doofus_specifics_message)
         else:
             output_container = await function_failure_message()
 
@@ -257,7 +257,7 @@ class Element_lookup(commands.Cog):
         '''
         output_string = ""
         for each in container_of_output:
-            output_string + container_of_output
+            output_string + each
             # I don't know what I am doing here, I have not worked with discord
             # code before so I cannot really do much more than concatenate
             # them all together into a new string and return that so that is
@@ -324,7 +324,7 @@ class Element_lookup(commands.Cog):
             element_object = mendeleev.element(element_id_user_input)
             output_container.append("Uses: " + element_object.uses        + "/n")
             output_container.append("Abundance in Crust" + element_object.abundance_crust + "/n")
-            output_container.append("Abundance in Sea" + element_object.abundance_sea + "/n")
+            output_container.append("Abundance in Sea: " + element_object.abundance_sea + "/n")
             output_container.append("Discoveries: " + element_object.discoveries  + "/n")
             output_container.append("Discovery Location: " + element_object.discovery_location  + "/n")
             output_container.append("Discovery Year: " + element_object.discovery_year        + "/n")
@@ -376,11 +376,11 @@ class Element_lookup(commands.Cog):
         Returns Nuclear properties of the element requested
         '''
         element_object = mendeleev.element(element_id_user_input)
-        output_container.append("Neutrons" + element_object.neutrons  + "/n")
-        output_container.append("Protons"  + element_object.protons   + "/n")
-                # atomic_radius
-                # atomic_weight
-        # is_radioactive
+        output_container.append("Neutrons: " + element_object.neutrons  + "/n")
+        output_container.append("Protons: "  + element_object.protons   + "/n")
+        output_container.append("Atomic Radius: "  + element_object.atomic_radius
+        output_container.append("Atomic Weight: "  + element_object.atomic_weight
+        output_container.append("Radioactivity: "  + element_object.is_radioactive
 
 ###############################################################################
     async def get_basic_element_properties(element_id_user_input):
@@ -391,7 +391,7 @@ class Element_lookup(commands.Cog):
         output_container.append("Element: "       + element_object.name          + "/n")
         output_container.append("Atomic Weight: " + element_object.atomic_weight + "/n")
         output_container.append("CAS Number: "    + element_object.cas           + "/n")
-        output_container.append("Mass:"           + element_object.mass          + "/n")
+        output_container.append("Mass: "           + element_object.mass          + "/n")
 
 
 ###############################################################################

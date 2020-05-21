@@ -18,7 +18,13 @@ from discord.ext import commands, tasks
 ##    list resources available
 ##    TODO: show basic info if no specificity in query
 # created by : mr_hai on discord / flyingfishfuse on github
-#
+##stuff:
+# https://www.thecrazyprogrammer.com/2018/05/wikipedia-api-python-tutorial.html
+# https://pypi.org/project/mendeleev/
+# https://wikipedia.readthedocs.io/en/latest/code.html#module-wikipedia
+# https://discordpy.readthedocs.io/en/latest/ext/commands/api.html#context
+# https://mendeleev.readthedocs.io/en/stable/notebooks/01_intro_to_mendeleev.html#Getting-list-of-elements
+
 #list_of_resources = "https://en.wikipedia.org/wiki/List_of_data_references_for_chemical_elements"
 #data_pages_list   = "https://en.wikipedia.org/wiki/Category:Chemical_element_data_pages"
 
@@ -171,7 +177,7 @@ async def lookup(ctx, arg1, arg2):
     await Element_lookup.validate_user_input(arg1, arg2)
     # once the data is parsed, you have to format!
     #this line sends the final output to the channel the user is asking from
-    await ctx.send(Element_lookup.format_and_print_output(output_container))
+    #await ctx.send(Element_lookup.format_and_print_output(output_container))
 
 ###############################################################################
 class Element_lookup(commands.Cog):
@@ -194,7 +200,7 @@ class Element_lookup(commands.Cog):
         elif type_of_pebkac_failure == "specifics":
             output_container = user_is_a_doofus_specifics_message
         else:
-            output_container = function_failure_message()
+            output_container = await function_failure_message()
 
 
 ###############################################################################
@@ -421,4 +427,3 @@ class Element_lookup(commands.Cog):
 #            output_container.append(each)
 #    pass
 ###############################################################################
-

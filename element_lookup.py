@@ -378,9 +378,9 @@ class Element_lookup(commands.Cog):
         element_object = mendeleev.element(element_id_user_input)
         output_container.append("Neutrons: " + element_object.neutrons  + "/n")
         output_container.append("Protons: "  + element_object.protons   + "/n")
-        output_container.append("Atomic Radius: "  + element_object.atomic_radius
-        output_container.append("Atomic Weight: "  + element_object.atomic_weight
-        output_container.append("Radioactivity: "  + element_object.is_radioactive
+        output_container.append("Atomic Radius: "  + element_object.atomic_radius  + "/n")
+        output_container.append("Atomic Weight: "  + element_object.atomic_weight  + "/n")
+        output_container.append("Radioactivity: "  + element_object.is_radioactive  + "/n")
 
 ###############################################################################
     async def get_basic_element_properties(element_id_user_input):
@@ -429,4 +429,4 @@ class Element_lookup(commands.Cog):
 #    pass
 ###############################################################################
 
-bot.run(token=discord_bot_token, bot=True)
+bot.run(discord_bot_token, bot=True)

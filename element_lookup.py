@@ -242,13 +242,11 @@ class Element_lookup(commands.Cog):
             This is something the creator of the bot needs to modify to suit
             Thier community.
         '''
-        output_string = ""
-        for each in container_of_output:
+        output_string = container_of_output.join
             # I don't know what I am doing here, I have not worked with discord
             # code before so I cannot really do much more than concatenate
             # them all together into a new string and return that so that is
             # what I am doing
-            output_string += each
         return output_string
 ################################################################################
 ##############          COMMANDS AND USER FUNCTIONS            #################
@@ -416,4 +414,3 @@ class Element_lookup(commands.Cog):
 #    pass
 ###############################################################################
 
-bot.run("NzEyNzM3NDEyMDE4NzMzMDc2.XsV6oQ.k6dPB3Az87Y4SpGw84a5r1_oPkU", bot=True)

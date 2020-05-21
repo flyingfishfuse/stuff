@@ -422,4 +422,3 @@ class Element_lookup(commands.Cog):
 #    pass
 ###############################################################################
 
-bot.run("NzEyNzM3NDEyMDE4NzMzMDc2.XsYm1g.5uGGeDUsEQ3SeLqcb_16CWWjOI0", bot=True)

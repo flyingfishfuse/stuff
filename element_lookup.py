@@ -5,6 +5,7 @@ import asyncio
 import discord
 import mendeleev
 import wikipedia
+import math, cmath
 from itertools import cycle
 #from bs4 import BeautifulSoup
 from discord.ext import commands, tasks
@@ -26,6 +27,7 @@ from discord.ext import commands, tasks
 ################################################################################
 bot = commands.Bot(command_prefix=("."))
 #who dis?
+bot_permissions = 92160
 devs = [446959856318939137, 589968097369128966]
 cog_directory_files = os.listdir("./cogs")
 load_cogs = False
@@ -43,9 +45,12 @@ user_is_a_doofus_specific_message = "Stop being a doofus and feed the data on sp
 #TODO: TYPE UP HELP MESSAGE
 help_message = "Put the element's name, symbol, or atomic number followed by either: physical, chemical, nuclear, ionization, isotopes, oxistates"
 #shamelessly stolen from stackoverflow
-def function_failure_message():
+def function_failure_message(exception_message):
     import inspect
-    return "something wierd happened in: " + inspect.currentframe().f_code.co_name
+    return "something wierd happened in: " + inspect.currentframe().f_code.co_name + \
+        "/n" + exception_message
+
+
 
 element_list = ['Hydrogen', 'Helium', 'Lithium', 'Beryllium', 'Boron', \
     'Carbon', 'Nitrogen', 'Oxygen', 'Fluorine', 'Neon', 'Sodium', \
@@ -81,6 +86,30 @@ symbol_list = ['H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne', 'Na', \
     'Mt', 'Ds', 'Rg', 'Cn', 'Nh', 'Fl', 'Mc', 'Lv', 'Ts']
 
 specifics_list = ["physical" , "chemical", "nuclear", "ionization", "isotopes", "oxistates"]
+
+yotta = 1000000000000000000000000#
+zetta = 1000000000000000000000  #
+exa =  1000000000000000000      #
+peta = 1000000000000000        #
+tera = 1000000000000         #
+giga = 1000000000          #
+mega = 1000000          #
+kilo = 1000          #
+hecto = 100       #
+deca = 10       #
+deci = 0.1     #
+centi = 0.01      #
+milli = 0.001       #
+micro = 0.00001       #
+nano = 0.00000001        #
+pico = 0.000000000001      #
+femto = 0.000000000000001    #
+atto = 0.000000000000000001    #
+zepto = 0.000000000000000000001 #
+yocto = 0.000000000000000000000001
+
+pi = 3.14159
+Vbe= 0.7 # volts
 
 ################################################################################
 ##############                      BOT CORE                   #################
@@ -137,16 +166,16 @@ async def usage(ctx):
 #   function that will call everything else and parse the arguments. Once the
 #   arguments are parsed, the algorhithm is applied, the output is formatted,
 #   and the user is sent a reply@bot.command()
-@commands.check(dev_check)
+@bot.command()
 async def lookup(ctx, arg1, arg2):
-    Element_lookup.validate_user_input(arg1, arg2)
+    await Element_lookup.validate_user_input(arg1, arg2)
     # once the data is parsed, you have to format!
     #this line sends the final output to the channel the user is asking from
     await ctx.send(Element_lookup.format_and_print_output(output_container))
 
 ###############################################################################
 class Element_lookup(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, ctx, bot):
         self.bot = bot
         print("loaded properties_lookup")
         #generate_element_name_list()
@@ -154,7 +183,7 @@ class Element_lookup(commands.Cog):
 ################################################################################
 ##############              INTERNAL  FUNCTIONS                #################
 ################################################################################
-    async def user_input_was_wrong(type_of_pebkac_failure):
+    def user_input_was_wrong(type_of_pebkac_failure):
         '''
         You can put something funny here!
             This is something the creator of the bot needs to modify to suit
@@ -169,7 +198,7 @@ class Element_lookup(commands.Cog):
 
 
 ###############################################################################
-    async def validate_user_input(self, ctx, *, element_id_user_input, specifics_requested):
+    async def validate_user_input(element_id_user_input, specifics_requested):
         '''
         checks if the user is requesting an actual element and set of data.
         '''
@@ -231,7 +260,7 @@ class Element_lookup(commands.Cog):
 # these needs to be integrated to the main script
 # This function compares ALL the elements to the one you provide
 # you can extend the functionality by copying the relevant code
-    async def compare_element_list(self, ctx, *, data_type : str, less_greater: str):
+    async def compare_element_list(data_type : str, less_greater: str):
         element_data_list = []
         return_element_by_id = lambda element_id_input : mendeleev.element(element_id_input)
         element_to_compare   = return_element_by_id(element_id_user_input)
@@ -260,33 +289,52 @@ class Element_lookup(commands.Cog):
 ###########################
 #these are already integrated into the core code of the script
 # they are not finished, but functional
-    async def get_basic_information(self, ctx, element_id_user_input):
+    async def get_basic_information(element_id_user_input):
         '''
         Returns some basic information about the element requested
         takes either a name,atomic number, or symbol
         '''
         try:
             element_object = mendeleev.element(element_id_user_input)
+            output_container.append("Description: " + element_object.description  + "/n")
             output_container.append("Sources: " + element_object.sources  + "/n")
-            output_container.append("Uses: " + element_object.uses        + "/n")
+
         except :
             print(Exception)
 ###############################################################################
-    async def get_isotopes(self, ctx, element_id_user_input):
+    async def get_history(element_id_user_input):
+        '''
+        Returns some historical information about the element requested
+        takes either a name,atomic number, or symbol
+        '''
+        try:
+            element_object = mendeleev.element(element_id_user_input)
+            output_container.append("Uses: " + element_object.uses        + "/n")
+            output_container.append("Abundance in Crust" + element_object.abundance_crust + "/n")
+            output_container.append("Abundance in Sea" + element_object.abundance_sea + "/n")
+            output_container.append("Discoveries: " + element_object.discoveries  + "/n")
+            output_container.append("Discovery Location: " + element_object.discovery_location  + "/n")
+            output_container.append("Discovery Year: " + element_object.discovery_year        + "/n")
+                    # name_origin
+        except :
+            print(Exception)
+
+###############################################################################
+    async def get_isotopes(element_id_user_input):
         '''
         Returns Isotopes of the element requested
         '''
         element_object = mendeleev.element(element_id_user_input)
         output_container.append("Isotopes: " + element_object.isotopes + "/n")
 ###############################################################################
-    async def get_ionization_energy(self, ctx, element_id_user_input):
+    async def get_ionization_energy(element_id_user_input):
         '''
         Returns Ionization energies of the element requested
         '''
         element_object = mendeleev.element(element_id_user_input)
         output_container.append("Ionization Energies: " + element_object.ionenergies  + "/n")
 ###############################################################################
-    async def get_physical_properties(self, ctx, element_id_user_input):
+    async def get_physical_properties(element_id_user_input):
         '''
         Returns physical properties of the element requested
         '''
@@ -298,7 +346,7 @@ class Element_lookup(commands.Cog):
         output_container.append("Specific Heat:"  + element_object.specific_heat + "/n")
         output_container.append("Thermal Conductivity:"  + element_object.thermal_conductivity + "/n")
 ###############################################################################
-    async def get_chemical_properties(self, ctx, element_id_user_input):
+    async def get_chemical_properties(element_id_user_input):
         '''
         Returns Chemical properties of the element requested
         '''
@@ -310,15 +358,19 @@ class Element_lookup(commands.Cog):
         output_container.append("Covalent Radius: "      + element_object.covalent_radius    + "/n")
         output_container.append("Polarizability: "       + element_object.dipole_polarizability  + "/n")
 ###############################################################################
-    async def get_nuclear_properties(self, ctx, element_id_user_input):
+    async def get_nuclear_properties(element_id_user_input):
         '''
         Returns Nuclear properties of the element requested
         '''
         element_object = mendeleev.element(element_id_user_input)
         output_container.append("Neutrons" + element_object.neutrons  + "/n")
         output_container.append("Protons"  + element_object.protons   + "/n")
+                # atomic_radius
+                # atomic_weight
+        # is_radioactive
+
 ###############################################################################
-    async def get_basic_element_properties(self, ctx, element_id_user_input):
+    async def get_basic_element_properties(element_id_user_input):
         '''
         takes either a name,atomic number, or symbol
         '''
@@ -364,4 +416,4 @@ class Element_lookup(commands.Cog):
 #    pass
 ###############################################################################
 
-bot.run("NzA2NzIyMjE0MzMzOTA2OTk1.XsT4dw.N9z8Z6WMZ2tSK3md2p26GjlK_UM")
+bot.run("NzEyNzM3NDEyMDE4NzMzMDc2.XsV6oQ.k6dPB3Az87Y4SpGw84a5r1_oPkU", bot=True)

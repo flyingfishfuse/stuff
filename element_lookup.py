@@ -38,19 +38,10 @@ bot_permissions = 92160
 devs = [446959856318939137, 589968097369128966]
 cog_directory_files = os.listdir("./cogs")
 load_cogs = False
-#not used yet
-input_container     = []
-#used yet
-output_container    = []
 #TODO: give this as an option eventually.
 #data_list           = wikipedia.page(title='List_of_data_references_for_chemical_elements')
+output_container = []
 
-#this is the  message sent by the bot if the user input did not pass validation
-user_is_a_doofus_element_message = "Stop being a doofus and feed the data on elements that I expect!"
-#this is the  message sent by the bot if the user input did not pass validation
-user_is_a_doofus_specific_message = "Stop being a doofus and feed the data on specifics that I expect!"
-#TODO: TYPE UP HELP MESSAGE
-help_message = "Put the element's name, symbol, or atomic number followed by either: physical, chemical, nuclear, ionization, isotopes, oxistates"
 #shamelessly stolen from stackoverflow
 def function_failure_message(exception_message):
     import inspect
@@ -161,8 +152,8 @@ async def on_ready():
 
 #HELP COMMAND
 @bot.command()
-async def usage(ctx):
-    await ctx.send(help_message)
+async def lookup_usage(ctx):
+    await ctx.send(Element_lookup.help_message)
 
 #FIRST COMMAND
 # right here we define behavior for the command
@@ -175,33 +166,39 @@ async def usage(ctx):
 #   and the user is sent a reply@bot.command()
 @bot.command()
 async def lookup(ctx, arg1, arg2):
-    await Element_lookup.validate_user_input(arg1, arg2)
+    await librarian = Element_lookup()
+    await librarian.validate_user_input(arg1, arg2)
     # once the data is parsed, you have to format!
     #this line sends the final output to the channel the user is asking from
-    #await ctx.send(Element_lookup.format_and_print_output(output_container))
+    await ctx.send(librarian.format_and_print_output(librarian.output_container))
 
 ###############################################################################
 class Element_lookup(commands.Cog):
-    def __init__(self, ctx, bot):
+    def __init__(self, ctx, bot, output_container : list): #, input_container):
         self.bot = bot
         print("loaded properties_lookup")
         #generate_element_name_list()
-
+        #self.input_container  = input_container
+        self.output_container = output_container
+        user_is_a_doofus_element_message = "Stop being a doofus and feed the data on elements that I expect!"
+        user_is_a_doofus_specific_message = "Stop being a doofus and feed the data on specifics that I expect!"
+        help_message = "Put the element's name, symbol, or atomic number followed by either: physical, chemical, nuclear, ionization, isotopes, oxistates"
 ################################################################################
 ##############              INTERNAL  FUNCTIONS                #################
 ################################################################################
-    async def user_input_was_wrong(type_of_pebkac_failure):
+    async def user_input_was_wrong(type_of_pebkac_failure : str):
         '''
         You can put something funny here!
             This is something the creator of the bot needs to modify to suit
             Thier community.
         '''
         if type_of_pebkac_failure == "element":
-            output_container.append(user_is_a_doofus_element_message)
+            output_container.append(self.user_is_a_doofus_element_message)
         elif type_of_pebkac_failure == "specifics":
-            output_container.append(user_is_a_doofus_specifics_message)
+            output_container.append(self.user_is_a_doofus_specifics_message)
+        #Throw a generic Exception out the window so it smacks the user in the head
         else:
-            output_container = await function_failure_message()
+            output_container.append(await function_failure_message(Exception))
 
 
 ###############################################################################
@@ -225,29 +222,29 @@ class Element_lookup(commands.Cog):
                     #do the thing
                     if specifics_requested.lower()    == "physical":
                         await Element_lookup.get_physical_properties(element_id_user_input)
-                        await Element_lookup.format_and_print_output(output_container)
+                        await Element_lookup.format_and_print_output(self.output_container)
                     elif specifics_requested.lower()  == "chemical":
                         await Element_lookup.get_chemical_properties(element_id_user_input)
-                        await Element_lookup.format_and_print_output(output_container)
+                        await Element_lookup.format_and_print_output(self.output_container)
                     elif specifics_requested.lower()  == "nuclear":
                         await Element_lookup.get_nuclear_properties(element_id_user_input)
-                        await Element_lookup.format_and_print_output(output_container)
+                        await Element_lookup.format_and_print_output(self.output_container)
                     elif specifics_requested.lower()  == "ionization":
                         await Element_lookup.get_ionization_energy(element_id_user_input)
-                        await Element_lookup.format_and_print_output(output_container)
+                        await Element_lookup.format_and_print_output(self.output_container)
                     elif specifics_requested.lower()  == "isotopes":
                         await Element_lookup.get_isotopes(element_id_user_input)
-                        await Element_lookup.format_and_print_output(output_container)
+                        await Element_lookup.format_and_print_output(self.output_container)
                     elif specifics_requested.lower()  == "oxistates":
                         await Element_lookup.get_oxistates(element_id_user_input)
-                        await Element_lookup.format_and_print_output(output_container)
+                        await Element_lookup.format_and_print_output(self.output_container)
                         # input given by user was NOT found in the validation data
                 else:
                     await Element_lookup.user_input_was_wrong("specifics")
-                    await Element_lookup.format_and_print_output(output_container)
+                    await Element_lookup.format_and_print_output(self.output_container)
         else:
             await Element_lookup.user_input_was_wrong("element")
-            await Element_lookup.format_and_print_output(output_container)
+            await Element_lookup.format_and_print_output(self.output_container)
 ###############################################################################
     async def format_and_print_output(container_of_output : list):
         '''
@@ -285,17 +282,17 @@ class Element_lookup(commands.Cog):
             if data_type == "affinity":
                 if less_greater == "less":
                     if element_object.electron_affinity < element_to_compare.electron_affinity:
-                        element_list.append(element_object.electron_affinity)
+                        element_data_list.append(element_object.electron_affinity)
                 elif less_greater == "greater":
                     if element_object.electron_affinity > element_to_compare.electron_affinity:
-                        element_list.append(element_object.electron_affinity)
+                        element_data_list.append(element_object.electron_affinity)
             elif data_type == "electronegativity":
                 if less_greater == "less":
                     if element_object.electronegativity < element_to_compare.electronegativity:
-                        element_list.append(element_object.electronegativity)
+                        element_data_list.append(element_object.electronegativity)
                 elif less_greater == "greater":
                     if element_object.electronegativity > element_to_compare.electronegativity:
-                        element_list.append(element_object.electronegativity)
+                        element_data_list.append(element_object.electronegativity)
 
 ############################
 # beta FUNCTIONS
@@ -309,8 +306,8 @@ class Element_lookup(commands.Cog):
         '''
         try:
             element_object = mendeleev.element(element_id_user_input)
-            output_container.append("Description: " + element_object.description  + "/n")
-            output_container.append("Sources: " + element_object.sources  + "/n")
+            self.output_container.append("Description: " + element_object.description  + "/n")
+            self.output_container.append("Sources: " + element_object.sources  + "/n")
 
         except :
             print(Exception)
@@ -322,12 +319,12 @@ class Element_lookup(commands.Cog):
         '''
         try:
             element_object = mendeleev.element(element_id_user_input)
-            output_container.append("Uses: " + element_object.uses        + "/n")
-            output_container.append("Abundance in Crust" + element_object.abundance_crust + "/n")
-            output_container.append("Abundance in Sea: " + element_object.abundance_sea + "/n")
-            output_container.append("Discoveries: " + element_object.discoveries  + "/n")
-            output_container.append("Discovery Location: " + element_object.discovery_location  + "/n")
-            output_container.append("Discovery Year: " + element_object.discovery_year        + "/n")
+            self.output_container.append("Uses: " + element_object.uses        + "/n")
+            self.output_container.append("Abundance in Crust" + element_object.abundance_crust + "/n")
+            self.output_container.append("Abundance in Sea: " + element_object.abundance_sea + "/n")
+            self.output_container.append("Discoveries: " + element_object.discoveries  + "/n")
+            self.output_container.append("Discovery Location: " + element_object.discovery_location  + "/n")
+            self.output_container.append("Discovery Year: " + element_object.discovery_year        + "/n")
                     # name_origin
         except :
             print(Exception)
@@ -338,49 +335,49 @@ class Element_lookup(commands.Cog):
         Returns Isotopes of the element requested
         '''
         element_object = mendeleev.element(element_id_user_input)
-        output_container.append("Isotopes: " + element_object.isotopes + "/n")
+        self.output_container.append("Isotopes: " + element_object.isotopes + "/n")
 ###############################################################################
     async def get_ionization_energy(element_id_user_input):
         '''
         Returns Ionization energies of the element requested
         '''
         element_object = mendeleev.element(element_id_user_input)
-        output_container.append("Ionization Energies: " + element_object.ionenergies  + "/n")
+        self.output_container.append("Ionization Energies: " + element_object.ionenergies  + "/n")
 ###############################################################################
     async def get_physical_properties(element_id_user_input):
         '''
         Returns physical properties of the element requested
         '''
         element_object = mendeleev.element(element_id_user_input)
-        output_container.append("Hardness: "      + element_object.hardness      + "/n")
-        output_container.append("Softness: "      + element_object.softness      + "/n")
-        output_container.append("Boiling Point:"  + element_object.boiling_point + "/n")
-        output_container.append("Melting Point:"  + element_object.melting_point + "/n")
-        output_container.append("Specific Heat:"  + element_object.specific_heat + "/n")
-        output_container.append("Thermal Conductivity:"  + element_object.thermal_conductivity + "/n")
+        self.output_container.append("Hardness: "      + element_object.hardness      + "/n")
+        self.output_container.append("Softness: "      + element_object.softness      + "/n")
+        self.output_container.append("Boiling Point:"  + element_object.boiling_point + "/n")
+        self.output_container.append("Melting Point:"  + element_object.melting_point + "/n")
+        self.output_container.append("Specific Heat:"  + element_object.specific_heat + "/n")
+        self.output_container.append("Thermal Conductivity:"  + element_object.thermal_conductivity + "/n")
 ###############################################################################
     async def get_chemical_properties(element_id_user_input):
         '''
         Returns Chemical properties of the element requested
         '''
         element_object = mendeleev.element(element_id_user_input)
-        output_container.append("Electron Affinity: "    + element_object.electron_affinity  + "/n")
-        output_container.append("Heat Of Formation: "    + element_object.heat_of_formation  + "/n")
-        output_container.append("Heat Of Evaportation: " + element_object.evaporation_heat   + "/n")
-        output_container.append("Electronegativity: "    + element_object.electronegativity  + "/n")
-        output_container.append("Covalent Radius: "      + element_object.covalent_radius    + "/n")
-        output_container.append("Polarizability: "       + element_object.dipole_polarizability  + "/n")
+        self.output_container.append("Electron Affinity: "    + element_object.electron_affinity  + "/n")
+        self.output_container.append("Heat Of Formation: "    + element_object.heat_of_formation  + "/n")
+        self.output_container.append("Heat Of Evaportation: " + element_object.evaporation_heat   + "/n")
+        self.output_container.append("Electronegativity: "    + element_object.electronegativity  + "/n")
+        self.output_container.append("Covalent Radius: "      + element_object.covalent_radius    + "/n")
+        self.output_container.append("Polarizability: "       + element_object.dipole_polarizability  + "/n")
 ###############################################################################
     async def get_nuclear_properties(element_id_user_input):
         '''
         Returns Nuclear properties of the element requested
         '''
         element_object = mendeleev.element(element_id_user_input)
-        output_container.append("Neutrons: " + element_object.neutrons  + "/n")
-        output_container.append("Protons: "  + element_object.protons   + "/n")
-        output_container.append("Atomic Radius: "  + element_object.atomic_radius  + "/n")
-        output_container.append("Atomic Weight: "  + element_object.atomic_weight  + "/n")
-        output_container.append("Radioactivity: "  + element_object.is_radioactive  + "/n")
+        self.output_container.append("Neutrons: " + element_object.neutrons  + "/n")
+        self.output_container.append("Protons: "  + element_object.protons   + "/n")
+        self.output_container.append("Atomic Radius: "  + element_object.atomic_radius  + "/n")
+        self.output_container.append("Atomic Weight: "  + element_object.atomic_weight  + "/n")
+        self.output_container.append("Radioactivity: "  + element_object.is_radioactive  + "/n")
 
 ###############################################################################
     async def get_basic_element_properties(element_id_user_input):
@@ -388,10 +385,10 @@ class Element_lookup(commands.Cog):
         takes either a name,atomic number, or symbol
         '''
         element_object = mendeleev.element(element_id_user_input)
-        output_container.append("Element: "       + element_object.name          + "/n")
-        output_container.append("Atomic Weight: " + element_object.atomic_weight + "/n")
-        output_container.append("CAS Number: "    + element_object.cas           + "/n")
-        output_container.append("Mass: "           + element_object.mass          + "/n")
+        self.output_container.append("Element: "       + element_object.name          + "/n")
+        self.output_container.append("Atomic Weight: " + element_object.atomic_weight + "/n")
+        self.output_container.append("CAS Number: "    + element_object.cas           + "/n")
+        self.output_container.append("Mass: "           + element_object.mass          + "/n")
 
 
 ###############################################################################

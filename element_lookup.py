@@ -9,6 +9,7 @@ import math, cmath
 from itertools import cycle
 #from bs4 import BeautifulSoup
 from discord.ext import commands, tasks
+from discord_key import discord_bot_token
 
 ################################################################################
 ## Chemical element resource database from wikipedia/mendeleev python library ##
@@ -427,3 +428,5 @@ class Element_lookup(commands.Cog):
 #            output_container.append(each)
 #    pass
 ###############################################################################
+
+bot.run(token=discord_bot_token, bot=True)

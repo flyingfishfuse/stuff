@@ -183,7 +183,7 @@ class Element_lookup(commands.Cog):
 ################################################################################
 ##############              INTERNAL  FUNCTIONS                #################
 ################################################################################
-    def user_input_was_wrong(type_of_pebkac_failure):
+    async def user_input_was_wrong(type_of_pebkac_failure):
         '''
         You can put something funny here!
             This is something the creator of the bot needs to modify to suit
@@ -217,24 +217,30 @@ class Element_lookup(commands.Cog):
                     # second variable was validated sucessfully so now we
                     #do the thing
                     if specifics_requested.lower()    == "physical":
-                        get_physical_properties(element_id_user_input)
+                        await Element_lookup.get_physical_properties(element_id_user_input)
+                        await Element_lookup.format_and_print_output(output_container)
                     elif specifics_requested.lower()  == "chemical":
-                        get_chemical_properties(element_id_user_input)
+                        await Element_lookup.get_chemical_properties(element_id_user_input)
+                        await Element_lookup.format_and_print_output(output_container)
                     elif specifics_requested.lower()  == "nuclear":
-                        get_nuclear_properties(element_id_user_input)
+                        await Element_lookup.get_nuclear_properties(element_id_user_input)
+                        await Element_lookup.format_and_print_output(output_container)
                     elif specifics_requested.lower()  == "ionization":
-                        get_ionization_energy(element_id_user_input)
+                        await Element_lookup.get_ionization_energy(element_id_user_input)
+                        await Element_lookup.format_and_print_output(output_container)
                     elif specifics_requested.lower()  == "isotopes":
-                        get_isotopes(element_id_user_input)
+                        await Element_lookup.get_isotopes(element_id_user_input)
+                        await Element_lookup.format_and_print_output(output_container)
                     elif specifics_requested.lower()  == "oxistates":
-                        get_oxistates(element_id_user_input)
+                        await Element_lookup.get_oxistates(element_id_user_input)
+                        await Element_lookup.format_and_print_output(output_container)
                         # input given by user was NOT found in the validation data
                 else:
-                    user_input_was_wrong("specifics")
-                    format_and_print_output(output_container)
+                    await Element_lookup.user_input_was_wrong("specifics")
+                    await Element_lookup.format_and_print_output(output_container)
         else:
-            user_input_was_wrong("element")
-            format_and_print_output(output_container)
+            await Element_lookup.user_input_was_wrong("element")
+            await Element_lookup.format_and_print_output(output_container)
 ###############################################################################
     async def format_and_print_output(container_of_output : list):
         '''
@@ -242,7 +248,9 @@ class Element_lookup(commands.Cog):
             This is something the creator of the bot needs to modify to suit
             Thier community.
         '''
-        output_string = container_of_output.join
+        output_string = ""
+        for each in container_of_output:
+            output_string + container_of_output
             # I don't know what I am doing here, I have not worked with discord
             # code before so I cannot really do much more than concatenate
             # them all together into a new string and return that so that is
@@ -414,3 +422,4 @@ class Element_lookup(commands.Cog):
 #    pass
 ###############################################################################
 
+bot.run("NzEyNzM3NDEyMDE4NzMzMDc2.XsYm1g.5uGGeDUsEQ3SeLqcb_16CWWjOI0", bot=True)

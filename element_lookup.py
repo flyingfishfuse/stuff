@@ -4,6 +4,7 @@ import re
 import asyncio
 import discord
 import mendeleev
+import threading
 import wikipedia
 import math, cmath
 from itertools import cycle
@@ -32,86 +33,27 @@ from discord_key import discord_bot_token
 ################################################################################
 ##############                BASIC VARIABLES                  #################
 ################################################################################
-bot = commands.Bot(command_prefix=("."))
+#bot = commands.Bot(command_prefix=("."))
 #who dis?
-bot_permissions = 92160
-devs = [446959856318939137, 589968097369128966]
-cog_directory_files = os.listdir("./cogs")
-load_cogs = False
 #TODO: give this as an option eventually.
 #data_list           = wikipedia.page(title='List_of_data_references_for_chemical_elements')
-output_container = []
-
 #shamelessly stolen from stackoverflow
 def function_failure_message(exception_message):
     import inspect
     return "something wierd happened in: " + inspect.currentframe().f_code.co_name + \
         "/n" + exception_message
 
-
-
-element_list = ['Hydrogen', 'Helium', 'Lithium', 'Beryllium', 'Boron', \
-    'Carbon', 'Nitrogen', 'Oxygen', 'Fluorine', 'Neon', 'Sodium', \
-    'Magnesium', 'Aluminum', 'Silicon', 'Phosphorus', 'Sulfur', 'Chlorine', \
-    'Argon', 'Potassium', 'Calcium', 'Scandium', 'Titanium', 'Vanadium', \
-    'Chromium', 'Manganese', 'Iron', 'Cobalt', 'Nickel', 'Copper', 'Zinc', \
-    'Gallium', 'Germanium', 'Arsenic', 'Selenium', 'Bromine', 'Krypton', \
-    'Rubidium', 'Strontium', 'Yttrium', 'Zirconium', 'Niobium', 'Molybdenum', \
-    'Technetium', 'Ruthenium', 'Rhodium', 'Palladium', 'Silver', 'Cadmium', \
-    'Indium', 'Tin', 'Antimony', 'Tellurium', 'Iodine', 'Xenon', 'Cesium', \
-    'Barium', 'Lanthanum', 'Cerium', 'Praseodymium', 'Neodymium', \
-    'Promethium', 'Samarium', 'Europium', 'Gadolinium', 'Terbium', \
-    'Dysprosium', 'Holmium', 'Erbium', 'Thulium', 'Ytterbium', 'Lutetium', \
-    'Hafnium', 'Tantalum', 'Tungsten', 'Rhenium', 'Osmium', 'Iridium', \
-    'Platinum', 'Gold', 'Mercury', 'Thallium', 'Lead', 'Bismuth', 'Polonium', \
-    'Astatine', 'Radon', 'Francium', 'Radium', 'Actinium', 'Thorium', \
-    'Protactinium', 'Uranium', 'Neptunium', 'Plutonium', 'Americium', 'Curium',\
-    'Berkelium', 'Californium', 'Einsteinium', 'Fermium', 'Mendelevium', \
-    'Nobelium', 'Lawrencium', 'Rutherfordium', 'Dubnium', 'Seaborgium', \
-    'Bohrium', 'Hassium', 'Meitnerium', 'Darmstadtium', 'Roentgenium', \
-    'Copernicium', 'Nihonium', 'Flerovium', 'Moscovium', 'Livermorium', \
-    'Tennessine']
-
-symbol_list = ['H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne', 'Na', \
-    'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar', 'K', 'Ca', 'Sc', 'Ti', 'V', 'Cr', \
-    'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn', 'Ga', 'Ge', 'As', 'Se', 'Br', 'Kr', \
-    'Rb', 'Sr', 'Y', 'Zr', 'Nb', 'Mo', 'Tc', 'Ru', 'Rh', 'Pd', 'Ag', 'Cd', \
-    'In', 'Sn', 'Sb', 'Te', 'I', 'Xe', 'Cs', 'Ba', 'La', 'Ce', 'Pr', 'Nd', \
-    'Pm', 'Sm', 'Eu', 'Gd', 'Tb', 'Dy', 'Ho', 'Er', 'Tm', 'Yb', 'Lu', 'Hf', \
-    'Ta', 'W', 'Re', 'Os', 'Ir', 'Pt', 'Au', 'Hg', 'Tl', 'Pb', 'Bi', 'Po', \
-    'At', 'Rn', 'Fr', 'Ra', 'Ac', 'Th', 'Pa', 'U', 'Np', 'Pu', 'Am', 'Cm', \
-    'Bk', 'Cf', 'Es', 'Fm', 'Md', 'No', 'Lr', 'Rf', 'Db', 'Sg', 'Bh', 'Hs', \
-    'Mt', 'Ds', 'Rg', 'Cn', 'Nh', 'Fl', 'Mc', 'Lv', 'Ts']
-
-specifics_list = ["physical" , "chemical", "nuclear", "ionization", "isotopes", "oxistates"]
-
-yotta = 1000000000000000000000000#
-zetta = 1000000000000000000000  #
-exa =  1000000000000000000      #
-peta = 1000000000000000        #
-tera = 1000000000000         #
-giga = 1000000000          #
-mega = 1000000          #
-kilo = 1000          #
-hecto = 100       #
-deca = 10       #
-deci = 0.1     #
-centi = 0.01      #
-milli = 0.001       #
-micro = 0.00001       #
-nano = 0.00000001        #
-pico = 0.000000000001      #
-femto = 0.000000000000001    #
-atto = 0.000000000000000001    #
-zepto = 0.000000000000000000001 #
-yocto = 0.000000000000000000000001
-
-pi = 3.14159
-Vbe= 0.7 # volts
-
 ################################################################################
-##############                      BOT CORE                   #################
+##############                     BOT CORE                    #################
+#    Every new command, needs a corrosponding function assigned in the class   #
 ################################################################################
+lookup_bot = commands.Bot(command_prefix=("."))
+bot_permissions = 92160
+devs = [446959856318939137, 589968097369128966]
+cog_directory_files = os.listdir("./cogs")
+load_cogs = False
+bot_help_message = "I am a beta bot, right now all you can do is \"lookup\" \
+                    \"element\" \"type_of_data\"."
 #load the cogs into the bot
 if load_cogs == True:
     for filename in cog_directory_files:
@@ -123,37 +65,41 @@ def dev_check(ctx):
     return str(ctx.author.id) in str(devs)
 
 #LOAD EXTENSION
-@bot.command()
+@lookup_bot.command()
 @commands.check(dev_check)
 async def load(ctx, extension):
     bot.load_extension(f"cogs.{extension}")
     await ctx.send(f"`{extension}`" + " Loaded !")
 
 #UNLOAD EXTENSION
-@bot.command()
+@lookup_bot.command()
 @commands.check(dev_check)
 async def unload(ctx, extension):
-    bot.unload_extension(f"cogs.{extension}")
+    lookup_bot.unload_extension(f"cogs.{extension}")
     await ctx.send(f"`{extension}`" + " Unloaded !")
 
 #RELOAD EXTENSION
-@bot.command()
+@lookup_bot.command()
 @commands.check(dev_check)
 async def reload(ctx, extension):
-    bot.unload_extension(f"cogs.{extension}")
-    bot.load_extension(f"cogs.{extension}")
+    lookup_bot.unload_extension(f"cogs.{extension}")
+    lookup_bot.load_extension(f"cogs.{extension}")
     await ctx.send(f"`{extension}`" + " Reloaded !")
 
 # WHEN STARTED, APPLY DIRECTLY TO FOREHEAD
-@bot.event
+@lookup_bot.event
 async def on_ready():
     print("Element_properties_lookup_tool")
-    await bot.change_presence(activity=discord.Game(name="THIS IS BETA !"))
+    await lookup_bot.change_presence(activity=discord.Game(name="THIS IS BETA !"))
 
 #HELP COMMAND
-@bot.command()
+@lookup_bot.command()
 async def lookup_usage(ctx):
-    await ctx.send(Element_lookup.help_message)
+    await Element_lookup.help_message()
+
+@lookup_bot.command()
+async def bot_usage(ctx):
+    await ctx.send(bot_help_message)
 
 #FIRST COMMAND
 # right here we define behavior for the command
@@ -164,47 +110,98 @@ async def lookup_usage(ctx):
 #   function that will call everything else and parse the arguments. Once the
 #   arguments are parsed, the algorhithm is applied, the output is formatted,
 #   and the user is sent a reply@bot.command()
-@bot.command()
+@lookup_bot.command()
 async def lookup(ctx, arg1, arg2):
-    await librarian = Element_lookup()
+    await librarian = threading.Thread(target=Element_lookup())
     await librarian.validate_user_input(arg1, arg2)
+    #await Element_lookup.validate_user_input(arg1, arg2)
     # once the data is parsed, you have to format!
     #this line sends the final output to the channel the user is asking from
-    await ctx.send(librarian.format_and_print_output(librarian.output_container))
+    await ctx.send(Element_lookup.format_and_print_output(Element_lookup.output_container))
 
 ###############################################################################
 class Element_lookup(commands.Cog):
-    def __init__(self, ctx, bot, output_container : list): #, input_container):
-        self.bot = bot
-        print("loaded properties_lookup")
+    element_list = ['Hydrogen', 'Helium', 'Lithium', 'Beryllium', 'Boron', \
+        'Carbon', 'Nitrogen', 'Oxygen', 'Fluorine', 'Neon', 'Sodium', \
+        'Magnesium', 'Aluminum', 'Silicon', 'Phosphorus', 'Sulfur', 'Chlorine', \
+        'Argon', 'Potassium', 'Calcium', 'Scandium', 'Titanium', 'Vanadium', \
+        'Chromium', 'Manganese', 'Iron', 'Cobalt', 'Nickel', 'Copper', 'Zinc', \
+        'Gallium', 'Germanium', 'Arsenic', 'Selenium', 'Bromine', 'Krypton', \
+        'Rubidium', 'Strontium', 'Yttrium', 'Zirconium', 'Niobium', 'Molybdenum', \
+        'Technetium', 'Ruthenium', 'Rhodium', 'Palladium', 'Silver', 'Cadmium', \
+        'Indium', 'Tin', 'Antimony', 'Tellurium', 'Iodine', 'Xenon', 'Cesium', \
+        'Barium', 'Lanthanum', 'Cerium', 'Praseodymium', 'Neodymium', \
+        'Promethium', 'Samarium', 'Europium', 'Gadolinium', 'Terbium', \
+        'Dysprosium', 'Holmium', 'Erbium', 'Thulium', 'Ytterbium', 'Lutetium', \
+        'Hafnium', 'Tantalum', 'Tungsten', 'Rhenium', 'Osmium', 'Iridium', \
+        'Platinum', 'Gold', 'Mercury', 'Thallium', 'Lead', 'Bismuth', 'Polonium', \
+        'Astatine', 'Radon', 'Francium', 'Radium', 'Actinium', 'Thorium', \
+        'Protactinium', 'Uranium', 'Neptunium', 'Plutonium', 'Americium', 'Curium',\
+        'Berkelium', 'Californium', 'Einsteinium', 'Fermium', 'Mendelevium', \
+        'Nobelium', 'Lawrencium', 'Rutherfordium', 'Dubnium', 'Seaborgium', \
+        'Bohrium', 'Hassium', 'Meitnerium', 'Darmstadtium', 'Roentgenium', \
+        'Copernicium', 'Nihonium', 'Flerovium', 'Moscovium', 'Livermorium', \
+        'Tennessine']
+    symbol_list = ['H', 'He', 'Li', 'Be', 'B', 'C', 'N', 'O', 'F', 'Ne', 'Na', \
+        'Mg', 'Al', 'Si', 'P', 'S', 'Cl', 'Ar', 'K', 'Ca', 'Sc', 'Ti', 'V', 'Cr', \
+        'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn', 'Ga', 'Ge', 'As', 'Se', 'Br', 'Kr', \
+        'Rb', 'Sr', 'Y', 'Zr', 'Nb', 'Mo', 'Tc', 'Ru', 'Rh', 'Pd', 'Ag', 'Cd', \
+        'In', 'Sn', 'Sb', 'Te', 'I', 'Xe', 'Cs', 'Ba', 'La', 'Ce', 'Pr', 'Nd', \
+        'Pm', 'Sm', 'Eu', 'Gd', 'Tb', 'Dy', 'Ho', 'Er', 'Tm', 'Yb', 'Lu', 'Hf', \
+        'Ta', 'W', 'Re', 'Os', 'Ir', 'Pt', 'Au', 'Hg', 'Tl', 'Pb', 'Bi', 'Po', \
+        'At', 'Rn', 'Fr', 'Ra', 'Ac', 'Th', 'Pa', 'U', 'Np', 'Pu', 'Am', 'Cm', \
+        'Bk', 'Cf', 'Es', 'Fm', 'Md', 'No', 'Lr', 'Rf', 'Db', 'Sg', 'Bh', 'Hs', \
+        'Mt', 'Ds', 'Rg', 'Cn', 'Nh', 'Fl', 'Mc', 'Lv', 'Ts']
+    specifics_list = ["physical" , "chemical", "nuclear", "ionization",\
+        "isotopes", "oxistates"]
+    def __init__(self, ctx): #, input_container : list):
+        #self.output_container = []
+        #self.element_list     = []
+        #self.symbol_list      = []
         #generate_element_name_list()
         #self.input_container  = input_container
-        self.output_container = output_container
-        user_is_a_doofus_element_message = "Stop being a doofus and feed the data on elements that I expect!"
-        user_is_a_doofus_specific_message = "Stop being a doofus and feed the data on specifics that I expect!"
-        help_message = "Put the element's name, symbol, or atomic number followed by either: physical, chemical, nuclear, ionization, isotopes, oxistates"
+        self.output_container = []
+        print("wtf dude")
+        self.user_is_a_doofus_element_message  = "Stop being a doofus and feed the \
+                                    data on elements that I expect!"
+        self.user_is_a_doofus_specific_message = "Stop being a doofus and feed the \
+                                    data on specifics that I expect!"
+
 ################################################################################
 ##############              INTERNAL  FUNCTIONS                #################
 ################################################################################
-    async def user_input_was_wrong(type_of_pebkac_failure : str):
+ #return_element_by_id = lambda element_id_input : mendeleev.element(element_id_input)
+ #for each in range(1,118):
+#     asdf = return_element_by_id(each)
+#     print(asdf.name)
+    async def generate_element_validation_name_list(self):
+        return_element_by_id = lambda element_id_input : mendeleev.element(element_id_input)
+        for element in range(1,118):
+            element_object = return_element_by_id(element)
+            element_list.append(element_object.name)
+            symbol_list.append(element_object.symbol)
+
+    async def user_input_was_wrong(self, type_of_pebkac_failure : str):
         '''
         You can put something funny here!
             This is something the creator of the bot needs to modify to suit
             Thier community.
         '''
         if type_of_pebkac_failure == "element":
-            output_container.append(self.user_is_a_doofus_element_message)
+            self.output_container.append(self.user_is_a_doofus_element_message)
         elif type_of_pebkac_failure == "specifics":
-            output_container.append(self.user_is_a_doofus_specifics_message)
-        #Throw a generic Exception out the window so it smacks the user in the head
+            self.output_container.append(self.user_is_a_doofus_specifics_message)
+        #Throw a generic Exception out the window so it smacks user in head
         else:
-            output_container.append(await function_failure_message(Exception))
+            self.output_container.append(await function_failure_message(Exception))
 
 
 ###############################################################################
     async def validate_user_input(element_id_user_input, specifics_requested):
         '''
         checks if the user is requesting an actual element and set of data.
+        This is the main function that "does the thing", you add new
+        behaviors here, and tie them to the commands in the bot core code
         '''
         #lets do some preliminary checks for special things to let other people
         # add special behavior, this is a social networking bot after
@@ -221,32 +218,32 @@ class Element_lookup(commands.Cog):
                     # second variable was validated sucessfully so now we
                     #do the thing
                     if specifics_requested.lower()    == "physical":
-                        await Element_lookup.get_physical_properties(element_id_user_input)
-                        await Element_lookup.format_and_print_output(self.output_container)
+                        await self.get_physical_properties(element_id_user_input)
+                        await self.format_and_print_output(self.output_container)
                     elif specifics_requested.lower()  == "chemical":
-                        await Element_lookup.get_chemical_properties(element_id_user_input)
-                        await Element_lookup.format_and_print_output(self.output_container)
+                        await self.get_chemical_properties(element_id_user_input)
+                        await self.format_and_print_output(self.output_container)
                     elif specifics_requested.lower()  == "nuclear":
-                        await Element_lookup.get_nuclear_properties(element_id_user_input)
-                        await Element_lookup.format_and_print_output(self.output_container)
+                        await self.get_nuclear_properties(element_id_user_input)
+                        await self.format_and_print_output(self.output_container)
                     elif specifics_requested.lower()  == "ionization":
-                        await Element_lookup.get_ionization_energy(element_id_user_input)
-                        await Element_lookup.format_and_print_output(self.output_container)
+                        await self.get_ionization_energy(element_id_user_input)
+                        await self.format_and_print_output(self.output_container)
                     elif specifics_requested.lower()  == "isotopes":
-                        await Element_lookup.get_isotopes(element_id_user_input)
-                        await Element_lookup.format_and_print_output(self.output_container)
+                        await self.get_isotopes(element_id_user_input)
+                        await self.format_and_print_output(self.output_container)
                     elif specifics_requested.lower()  == "oxistates":
-                        await Element_lookup.get_oxistates(element_id_user_input)
-                        await Element_lookup.format_and_print_output(self.output_container)
+                        await self.get_oxistates(element_id_user_input)
+                        await self.format_and_print_output(self.output_container)
                         # input given by user was NOT found in the validation data
                 else:
-                    await Element_lookup.user_input_was_wrong("specifics")
-                    await Element_lookup.format_and_print_output(self.output_container)
+                    await self.user_input_was_wrong("specifics")
+                    await self.format_and_print_output(self.output_container)
         else:
-            await Element_lookup.user_input_was_wrong("element")
-            await Element_lookup.format_and_print_output(self.output_container)
+            await self.user_input_was_wrong("element")
+            await self.format_and_print_output(self.output_container)
 ###############################################################################
-    async def format_and_print_output(container_of_output : list):
+    async def format_and_print_output(container_of_output: list):
         '''
         Makes a pretty formatted message as a return value
             This is something the creator of the bot needs to modify to suit
@@ -259,7 +256,8 @@ class Element_lookup(commands.Cog):
             # code before so I cannot really do much more than concatenate
             # them all together into a new string and return that so that is
             # what I am doing
-        return output_string
+        #return output_string
+        await ctx.send(self.format_and_print_output(self.output_container))
 ################################################################################
 ##############          COMMANDS AND USER FUNCTIONS            #################
 ################################################################################
@@ -270,6 +268,11 @@ class Element_lookup(commands.Cog):
 # these needs to be integrated to the main script
 # This function compares ALL the elements to the one you provide
 # you can extend the functionality by copying the relevant code
+    async def help_message():
+        await ctx.send("Put the element's name, symbol, or atomic number followed \
+                by either: physical, chemical, nuclear, ionization, isotopes, \
+                oxistates")
+###############################################################################
     async def compare_element_list(data_type : str, less_greater: str):
         element_data_list = []
         return_element_by_id = lambda element_id_input : mendeleev.element(element_id_input)
@@ -426,4 +429,4 @@ class Element_lookup(commands.Cog):
 #    pass
 ###############################################################################
 
-bot.run(discord_bot_token, bot=True)
+lookup_bot.run(discord_bot_token, bot=True)

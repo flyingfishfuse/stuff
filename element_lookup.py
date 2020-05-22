@@ -92,7 +92,7 @@ async def on_ready():
 #HELP COMMAND
 @lookup_bot.command()
 async def lookup_usage(ctx):
-    await Element_lookup.help_message()
+    await ctx.send(await Element_lookup.help_message())
 
 @lookup_bot.command()
 async def bot_usage(ctx):
@@ -136,10 +136,10 @@ class Element_lookup(commands.Cog):
 #     asdf = return_element_by_id(each)
 #     print(asdf.name)
 ################################################################################
-    async def help_message(ctx):
-        await ctx.send("Put the element's name, symbol, or atomic number followed \
-                by either: physical, chemical, nuclear, ionization, isotopes, \
-                oxistates")
+    async def help_message():
+        return "Put the element's name, symbol, or atomic number followed \
+by either: physical, chemical, nuclear, ionization, isotopes, \
+oxistates"
 
     def function_failure_message(self, exception_message):
         import inspect

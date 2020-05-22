@@ -136,7 +136,12 @@ class Element_lookup(commands.Cog):
 #     asdf = return_element_by_id(each)
 #     print(asdf.name)
 ################################################################################
-    def function_failure_message(exception_message):
+    async def help_message(ctx):
+        await ctx.send("Put the element's name, symbol, or atomic number followed \
+                by either: physical, chemical, nuclear, ionization, isotopes, \
+                oxistates")
+
+    def function_failure_message(self, exception_message):
         import inspect
         return "something wierd happened in: " + inspect.currentframe().f_code.co_name + \
             "/n" + exception_message
@@ -234,10 +239,6 @@ class Element_lookup(commands.Cog):
 # these needs to be integrated to the main script
 # This function compares ALL the elements to the one you provide
 # you can extend the functionality by copying the relevant code
-    async def help_message():
-        await ctx.send("Put the element's name, symbol, or atomic number followed \
-                by either: physical, chemical, nuclear, ionization, isotopes, \
-                oxistates")
 ###############################################################################
     def compare_element_list(self, data_type : str, less_greater: str):
         element_data_list = []

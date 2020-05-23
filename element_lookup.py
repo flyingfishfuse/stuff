@@ -15,7 +15,9 @@ from discord_key import discord_bot_token
 ################################################################################
 ## Chemical element resource database from wikipedia/mendeleev python library ##
 ##                             for discord bot                                ##
-###############################################################################
+## Licensed under GPLv3                                                       ##
+## https://www.gnu.org/licenses/gpl-3.0.en.html                               ##
+################################################################################
 ##    Search by element number, symbol,
 ##    list resources available
 ##    TODO: show basic info if no specificity in query

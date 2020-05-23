@@ -50,12 +50,22 @@ cog_directory_files = os.listdir("./cogs")
 load_cogs = False
 bot_help_message = "I am a beta bot, right now all you can do is \"lookup\" \
     \"element\" \"type_of_data\"."
-output_container = []
+
+def function_failure_message(exception_message):
+        import inspect
+        return "something wierd happened in: " + inspect.currentframe().f_code.co_name + \
+            "/n" + exception_message
+
+# GLOBAL OUTPUT CONTAINER FOR FINAL CHECKS
+global global_output_container 
+global_output_container = []
+
+
 #load the cogs into the bot
 if load_cogs == True:
     for filename in cog_directory_files:
         if filename.endswith(".py"):
-            bot.load_extension(f"cogs.{filename[:-3]}")
+            lookup_bot.load_extension(f"cogs.{filename[:-3]}")
 
 # check if the person sending the command is a developer
 def dev_check(ctx):
@@ -65,7 +75,7 @@ def dev_check(ctx):
 @lookup_bot.command()
 @commands.check(dev_check)
 async def load(ctx, extension):
-    bot.load_extension(f"cogs.{extension}")
+    lookup_bot.load_extension(f"cogs.{extension}")
     await ctx.send(f"`{extension}`" + " Loaded !")
 
 #UNLOAD EXTENSION
@@ -111,23 +121,20 @@ async def bot_usage(ctx):
 @lookup_bot.command()
 async def lookup(ctx, arg1, arg2):
     await Element_lookup.validate_user_input(arg1, arg2)
-    await ctx.send(Element_lookup.format_and_print_output(Element_lookup.output_container))
-
+    #print from global output container
+    #await Element_lookup.format_and_print_output(global_output_container)
+    await ctx.send(global_output_container)
 ###############################################################################
 class Element_lookup(commands.Cog):
-
+    user_is_a_doofus_element_message  = "Stop being a doofus and feed the " + \
+                                        "data on elements that I expect! "
+    user_is_a_doofus_specific_message = "Stop being a doofus and feed the " + \
+                                        "data on specifics that I expect! "
     def __init__(self, ctx): #, input_container : list):
-        self.output_container = []
-        self.element_list     = []
-        self.symbol_list      = []
         #generate_element_name_list()
         #self.input_container  = input_container
         self.output_container = []
-        print("wtf dude")
-        self.user_is_a_doofus_element_message  = "Stop being a doofus and feed the \
-                                    data on elements that I expect!"
-        self.user_is_a_doofus_specific_message = "Stop being a doofus and feed the \
-                                    data on specifics that I expect!"
+
 ################################################################################
 ##############              INTERNAL  FUNCTIONS                #################
 ################################################################################
@@ -138,83 +145,78 @@ class Element_lookup(commands.Cog):
 ################################################################################
     async def help_message():
         return "Put the element's name, symbol, or atomic number followed \
-by either: physical, chemical, nuclear, ionization, isotopes, \
-oxistates"
+    by either: physical, chemical, nuclear, ionization, isotopes, \
+    oxistates"
 
-    def function_failure_message(self, exception_message):
-        import inspect
-        return "something wierd happened in: " + inspect.currentframe().f_code.co_name + \
-            "/n" + exception_message
+#deprecated
+#     def generate_element_validation_name_list(self):
+#        from variables_for_reality import element_list , symbol_list , specifics_list
+#        return_element_by_id = lambda element_id_input : mendeleev.element(element_id_input)
+#        for element in range(1,118):
+#            element_object = return_element_by_id(element)
+#            element_list.append(element_object.name)
+#            symbol_list.append(element_object.symbol)
 
-    def generate_element_validation_name_list(self):
-        return_element_by_id = lambda element_id_input : mendeleev.element(element_id_input)
-        for element in range(1,118):
-            self.element_object = return_element_by_id(element)
-            element_list.append(element_object.name)
-            symbol_list.append(element_object.symbol)
-
-    def user_input_was_wrong(self, type_of_pebkac_failure : str):
+    async def user_input_was_wrong(type_of_pebkac_failure : str):
         """
         You can put something funny here!
             This is something the creator of the bot needs to modify to suit
             Thier community.
         """
         if type_of_pebkac_failure == "element":
-            self.output_container.append(self.user_is_a_doofus_element_message)
+            global_output_container.append(Element_lookup.user_is_a_doofus_element_message)
         elif type_of_pebkac_failure == "specifics":
-            self.output_container.append(self.user_is_a_doofus_specifics_message)
+            global_output_container.append(Element_lookup.user_is_a_doofus_specifics_message)
         #Throw a generic Exception out the window so it smacks user in head
         else:
-            self.output_container.append(self.function_failure_message(Exception))
+            print(type_of_pebkac_failure)
+ #           global global_output_container
+ #           global_output_container.append(function_failure_message(Exception))
 
-    async def validate_user_input(self, element_id_user_input, specifics_requested):
+    async def validate_user_input(element_id_user_input, specifics_requested):
         """
         checks if the user is requesting an actual element and set of data.
         This is the main function that "does the thing", you add new
         behaviors here, and tie them to the commands in the bot core code
         """
         #lets do some preliminary checks for special things to let other people
-        # add special behavior, this is a social networking bot after
+        # add special behavior, this is a social networking bot after all
         #if element_id_user_input
         # loops over the element and symbol lists and checks if the data
         # requested is within the range of known elements
         #checks atomic number
-        from variables_for_reality import element_list , symbol_list
-        if element_id_user_input in range(1-118) or \
-            any(user_input == element_id_user_input for user_input in element_list) or \
-            any(user_input == element_id_user_input for user_input in symbol_list):
-            # Element identification the user provided was in the list of elements
-            # now we have to check the second input
+        from variables_for_reality import element_list , symbol_list , specifics_list
+        for each in (element_list, symbol_list):
+            if any(user_input == element_id_user_input for user_input in each):
                 if any(user_input == specifics_requested for user_input in specifics_list):
-                    # second variable was validated sucessfully so now we
-                    #do the thing
-                    if specifics_requested.lower()    == "physical":
-                        await self.get_physical_properties(element_id_user_input)
-                        await self.format_and_print_output(self.output_container)
-                    elif specifics_requested.lower()  == "chemical":
-                        await self.get_chemical_properties(element_id_user_input)
-                        await self.format_and_print_output(self.output_container)
-                    elif specifics_requested.lower()  == "nuclear":
-                        await self.get_nuclear_properties(element_id_user_input)
-                        await self.format_and_print_output(self.output_container)
-                    elif specifics_requested.lower()  == "ionization":
-                        await self.get_ionization_energy(element_id_user_input)
-                        await self.format_and_print_output(self.output_container)
-                    elif specifics_requested.lower()  == "isotopes":
-                        await self.get_isotopes(element_id_user_input)
-                        await self.format_and_print_output(self.output_container)
-                    elif specifics_requested.lower()  == "oxistates":
-                        await self.get_oxistates(element_id_user_input)
-                        await self.format_and_print_output(self.output_container)
-                        # input given by user was NOT found in the validation data
-                else:
-                    await self.user_input_was_wrong("specifics")
-                    await self.format_and_print_output(self.output_container)
-        else:
-            await self.user_input_was_wrong("element")
-            await self.format_and_print_output(self.output_container)
+                    if any(user_input == specifics_requested for user_input in specifics_list):
+                        if specifics_requested.lower()    == "physical":
+                            await Element_lookup.get_physical_properties(ctx, element_id_user_input)
+                            #await Element_lookup.format_and_print_output(global_output_container)
+                        elif specifics_requested.lower()  == "chemical":
+                            await Element_lookup.get_chemical_properties(element_id_user_input)
+                            #await Element_lookup.format_and_print_output(global_output_container)
+                        elif specifics_requested.lower()  == "nuclear":
+                            await Element_lookup.get_nuclear_properties(element_id_user_input)
+                            #await Element_lookup.format_and_print_output(global_output_container)
+                        elif specifics_requested.lower()  == "ionization":
+                            await Element_lookup.get_ionization_energy(element_id_user_input)
+                            #await Element_lookup.format_and_print_output(global_output_container)
+                        elif specifics_requested.lower()  == "isotopes":
+                            await Element_lookup.get_isotopes(element_id_user_input)
+                            #await Element_lookup.format_and_print_output(global_output_container)
+                        elif specifics_requested.lower()  == "oxistates":
+                            await Element_lookup.get_oxistates(element_id_user_input)
+                            #await Element_lookup.format_and_print_output(global_output_container)
+                            # input given by user was NOT found in the validation data
+                        else:
+                            await Element_lookup.user_input_was_wrong(ctx, "specifics")
+                            #await Element_lookup.format_and_print_output(global_output_container)
+                    else:
+                        await Element_lookup.user_input_was_wrong(ctx, "element")
+                        #await Element_lookup.format_and_print_output(global_output_container)
 
-    async def format_and_print_output(self, container_of_output: list):
+    async def format_and_print_output(container_of_output: list):
         """
         Makes a pretty formatted message as a return value
             This is something the creator of the bot needs to modify to suit
@@ -228,7 +230,8 @@ oxistates"
             # them all together into a new string and return that so that is
             # what I am doing
         #return output_string
-        await ctx.send(self.format_and_print_output(self.output_container))
+        global global_output_container
+        global_output_container = output_string
 ################################################################################
 ##############          COMMANDS AND USER FUNCTIONS            #################
 ################################################################################
@@ -240,7 +243,7 @@ oxistates"
 # This function compares ALL the elements to the one you provide
 # you can extend the functionality by copying the relevant code
 ###############################################################################
-    def compare_element_list(self, data_type : str, less_greater: str):
+    def compare_element_list(self, element_id_user_input, data_type : str, less_greater: str):
         element_data_list = []
         return_element_by_id = lambda element_id_input : mendeleev.element(element_id_input)
         element_to_compare   = return_element_by_id(element_id_user_input)
